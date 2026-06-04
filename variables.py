@@ -15,3 +15,20 @@ elif marks >= 35:
     print(student_name + " has passed the exam with a very low score.")   
 else:
     print(student_name + " has failed the exam.")
+
+
+
+'''@app.router('/')
+def home():
+    return render_template('base.html')
+
+@app.router('/')
+def home():
+    return render_template('student.html')'''
+
+#student = [
+   # {"name": tanuja,"Roll_no": 12,"marks": 85},
+    #{"name": tanuja,"Roll_no": 12,"marks": 85},
+    #{"name": tanuja,"Roll_no": 12,"marks": 85},
+    #{"name": dnyaneshwari,"Roll_no": 12,"marks": 85},
+#]

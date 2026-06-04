@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}collage portal (% endblock %}</title>
+    
+    </head>
+    <body>
+        <nav>
+            <a href="{{ url_for('home')}}">HOme</a>
+            <a href="{{ url_for('Students')}}">Students</a>
+            <a href="{{ url_for('about')}}">about</a>
+        </nav>
+         
+        <hr>
+
+        {% block content %}
+        {% endblock}
+        <hr>
+        <small>Collage portal - build with flask </small>
+    </body>
+</html>

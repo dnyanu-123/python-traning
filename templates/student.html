@@ -1,0 +1,21 @@
+{% extends 'base.html'%}
+
+{% block title %} Home - Collage Portal  {% endblock %}
+
+{% block content %}
+<h1> all student </h1>
+<p>Total  students{{student|length}} :</p>
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Roll Number</th>
+        <th>Marks</th>
+        <th>Grade</th>
+    </tr>
+    {% for student in students %}
+    <tr>
+        
+    </tr>
+
+</table>
