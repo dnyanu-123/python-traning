@@ -1,1 +1,21 @@
-# code that generates the planner.html template for the AI trip planner application
+{% extends 'base.html' %}
+
+{% block title %}Planner{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1>Trip Planner</h1>
+
+    <h3>User Information</h3>
+    <p>Name: {{ user_info.name }}</p>
+    <p>Age: {{ user_info.age }}</p>
+    <p>Email: {{ user_info.email }}</p>
+
+    <h3>Trip Details</h3>
+    <p>Destination: {{ trip_details.destination }}</p>
+    <p>Days: {{ trip_details.days }}</p>
+    <p>Budget: ₹{{ trip_details.budget }}</p>
+</div>
+
+{% endblock %}

@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 
-
 app = Flask(__name__)
 
 #project data dictonary
@@ -44,45 +43,22 @@ places_info = {
 
 @app.route("/")
 def home():
-    return f"""
-    <h1>AI Trip Planner</h1>
-
-    <h2>User Information</h2>
-    <p>Name: {user_info['name']}</p>
-    <p>Age: {user_info['age']}</p>
-
-    <h2>Trip Details</h2>
-    <p>Destination: {trip_details['destination']}</p>
-    <p>Days: {trip_details['days']}</p>
-    <p>Budget: ₹{trip_details['budget']}</p>
-
-    <h2>Hotel</h2>
-    <p>{hotel_info['hotel_name']}</p>
-
-    <h2>Transport</h2>
-    <p>{transport_info['mode']}</p>
-
-    <h2>Places to Visit</h2>
-    <ul>
-        <li>{places_info['place1']}</li>
-        <li>{places_info['place2']}</li>
-        <li>{places_info['place3']}</li>
-    </ul>
-    """
-
+    return render_template('home.html')
+    
 
 @app.route("/about")
 def about():
     return render_template("about.html")
 
-
-@app.route("/places")
-def places():
-    return "<h1>Popular Places</h1><p>Here are some amazing places you can visit!</p>"
-
 @app.route("/planner")
 def planner():
-    return "<h1>Trip Planner</h1><p>Use our AI-powered trip planner to create your perfect itinerary.</p>"
+    return render_template("planner.html",user_info=user_info, trip_details=trip_details)
+                            
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
 
 
 if __name__ == "__main__":
