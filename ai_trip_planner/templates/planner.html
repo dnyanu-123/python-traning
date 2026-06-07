@@ -4,18 +4,76 @@
 
 {% block content %}
 
+<style>
+.table-container{
+    margin-top:20px;
+}
+
+.custom-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+.custom-table th{
+    background:linear-gradient(135deg,#4a90e2,#6a5acd);
+    color:white;
+    padding:12px;
+    text-align:center;
+}
+
+.custom-table td{
+    padding:12px;
+    text-align:center;
+    border-bottom:1px solid #ddd;
+}
+
+.custom-table tr:nth-child(even){
+    background:#f4f7fc;
+}
+
+.custom-table tr:hover{
+    background:#e8f0ff;
+    transition:0.3s;
+}
+
+h3{
+    color:#4a90e2;
+    margin-bottom:15px;
+}
+</style>
 <div class="container mt-4">
     <h1>Trip Planner</h1>
+    <h3>Travellers List</h3>
 
-    <h3>User Information</h3>
-    <p>Name: {{ user_info.name }}</p>
-    <p>Age: {{ user_info.age }}</p>
-    <p>Email: {{ user_info.email }}</p>
+<div class="table-container">
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Passport</th>
+            </tr>
+        </thead>
 
-    <h3>Trip Details</h3>
-    <p>Destination: {{ trip_details.destination }}</p>
-    <p>Days: {{ trip_details.days }}</p>
-    <p>Budget: ₹{{ trip_details.budget }}</p>
+        <tbody>
+            {% for traveller in travellers %}
+            <tr>
+                <td>{{ traveller.name }}</td>
+                <td>{{ traveller.age }}</td>
+                <td>{{ traveller.gender }}</td>
+                <td>{{ traveller.passport }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    
 </div>
 
 {% endblock %}
