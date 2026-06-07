@@ -15,7 +15,7 @@
     background:white;
     border-radius:10px;
     overflow:hidden;
-    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+    box-shadow:0 4px 12px rgba(65, 23, 23, 0.15);
 }
 
 .custom-table th{
@@ -56,7 +56,8 @@ h3{
                 <th>Name</th>
                 <th>Age</th>
                 <th>Gender</th>
-                <th>Passport</th>
+                <th>Email</th>
+                <th>contact_no</th>
             </tr>
         </thead>
 
@@ -66,7 +67,8 @@ h3{
                 <td>{{ traveller.name }}</td>
                 <td>{{ traveller.age }}</td>
                 <td>{{ traveller.gender }}</td>
-                <td>{{ traveller.passport }}</td>
+                <td>{{ traveller.email }}</td>
+                <td>{{ traveller.contact_no }}</td>
             </tr>
             {% endfor %}
         </tbody>

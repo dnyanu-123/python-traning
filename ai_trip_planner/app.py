@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
 app = Flask(__name__)
+
 travellers = []
+
 #project data dictonary
 # 2. Trip Details
 trip_details = {
@@ -41,8 +43,9 @@ def add_traveller():
         traveller = {
             "name": request.form["name"],
             "age": request.form["age"],
+            "email": request.form["email"],
             "gender": request.form["gender"],
-            "passport": request.form["passport"]
+            "contact_no": request.form["contact_no"]
         }
 
         travellers.append(traveller)
