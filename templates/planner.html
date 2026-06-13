@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Planner{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+```
+<h1 class="text-center mb-5">AI Trip Planner</h1>
+
+<!-- Dashboard -->
+<div class="row mb-4">
+
+    <div class="col-md-4">
+        <div class="card shadow text-center p-3 bg-primary text-white">
+            <h6>Total Travellers</h6>
+            <h2>{{ total_travellers }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow text-center p-3 bg-success text-white">
+            <h5>Trip Planner</h5>
+            <h2>Active</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow text-center p-3 bg-warning">
+            <h5>Total Records</h5>
+            <h2>{{ total_travellers }}</h2>
+        </div>
+    </div>
+
+</div>
+
+<h3>Travellers List</h3>
+
+<input
+    type="text"
+    id="searchInput"
+    class="form-control mb-3"
+    placeholder="Search Traveller">
+
+<table class="table table-bordered table-striped table-hover">
+
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Destination</th>
+            <th>Days</th>
+            <th>Budget</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for traveller in travellers %}
+        <tr>
+            <td>{{ traveller[0] }}</td>
+            <td>{{ traveller[1] }}</td>
+            <td>{{ traveller[2] }}</td>
+            <td>{{ traveller[3] }}</td>
+            <td>{{ traveller[4] }}</td>
+            <td>{{ traveller[5] }}</td>
+            <td>{{ traveller[6] }}</td>
+            <td>₹{{ traveller[7] }}</td>
+
+            <td>
+                <a href="/edit_traveller/{{ traveller[0] }}"
+                   class="btn btn-warning btn-sm">
+                   Edit
+                </a>
+
+                <a href="/delete_traveller/{{ traveller[0] }}"
+                   class="btn btn-danger btn-sm">
+                   Delete
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+
+</table>
+```
+
+</div>
+
+<script>
+window.onload = function () {
+
+    const searchInput = document.getElementById("searchInput");
+
+    searchInput.addEventListener("keyup", function () {
+
+        let value = searchInput.value.toLowerCase();
+
+        let rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(function(row) {
+
+            let text = row.innerText.toLowerCase();
+
+            if (text.indexOf(value) > -1) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+
+        });
+
+    });
+
+};
+</script>
+
+{% endblock %}
