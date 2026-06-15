@@ -1,17 +1,27 @@
 import sqlite3
 
-conn = sqlite3.connect('trip_planner.db')
-cursor = conn.cursor()
+DATABASE = "trips.db"
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS travellers (
-    trip_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    age INTEGER NOT NULL,
-    contact_no TEXT NOT NULL
-)
-''')
+import sqlite3
 
-conn.commit()
-conn.close()
-print("Database and table created successfully.")
+def get_db():
+    conn = sqlite3.connect("trips.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    conn = get_db()
+
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS travellers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        destination TEXT NOT NULL,
+        budget INTEGER,
+        days INTEGER
+    )
+    """)
+
+    conn.commit()
+    conn.close()

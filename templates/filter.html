@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Filter Trips</h2>
+
+    <form method="GET">
+
+        <select name="destination" class="form-select mb-2">
+
+            <option value="">All Destinations</option>
+
+            {% for item in destinations %}
+
+                <option
+                    value="{{ item['destination'] }}"
+                    {% if selected_destination == item['destination'] %}
+                        selected
+                    {% endif %}
+                >
+                    {{ item["destination"] }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <select name="budget" class="form-select mb-2">
+
+            <option value="">All Budgets</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+
+        </select>
+
+        <button class="btn btn-primary">
+            Filter
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

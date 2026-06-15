@@ -1,3 +1,5 @@
+BASE.HTML
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,9 +21,20 @@
             <a class="nav-link" href="{{ url_for('about') }}">About</a>
             <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
             <a class="nav-link" href="{{ url_for('add_traveller') }}">Add Traveller</a>
+            <a class="nav-link" href="{{ url_for('search') }}">Search</a>
         </div>
     </div>
 </nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} m-3">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
 <div class="container mt-4">
     {% block content %}{% endblock %}
@@ -29,3 +42,10 @@
 
 </body>
 </html>
+
+
+
+
+
+
+

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Search Trips</h2>
+
+    <form method="GET" action="{{ url_for('search') }}" class="mb-3">
+
+        <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Search by traveller or destination"
+            value="{{ query }}"
+        >
+
+    </form>
+
+    {% if travellers %}
+
+        <table class="table table-bordered">
+
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Destination</th>
+                    <th>Budget</th>
+                    <th>Days</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for traveller in travellers %}
+
+                <tr>
+                    <td>{{ traveller["name"] }}</td>
+                    <td>{{ traveller["destination"] }}</td>
+                    <td>{{ traveller["budget"] }}</td>
+                    <td>{{ traveller["days"] }}</td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% elif query %}
+
+        <div class="alert alert-warning">
+            No trips found for "{{ query }}"
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

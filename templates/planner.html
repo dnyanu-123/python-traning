@@ -61,30 +61,37 @@
 
     <tbody>
 
-    {% for traveller in travellers %}
+        {% for traveller in travellers %}
         <tr>
-            <td>{{ traveller[0] }}</td>
-            <td>{{ traveller[1] }}</td>
-            <td>{{ traveller[2] }}</td>
-            <td>{{ traveller[3] }}</td>
-            <td>{{ traveller[4] }}</td>
-            <td>{{ traveller[5] }}</td>
-            <td>{{ traveller[6] }}</td>
-            <td>₹{{ traveller[7] }}</td>
+            <td>{{ traveller['id'] }}</td>
+            <td>{{ traveller['name'] }}</td>
+            <td>{{ traveller['age'] }}</td>
+            <td>{{ traveller['email'] }}</td>
+            <td>{{ traveller['contact_no'] }}</td>
+            <td>{{ traveller['destination'] }}</td>
+            <td>{{ traveller['days'] }}</td>
+            <td>₹{{ traveller['budget'] }}</td>
 
             <td>
-                <a href="/edit_traveller/{{ traveller[0] }}"
+                <a href="{{ url_for('edit_traveller', id=traveller['id']) }}"
                    class="btn btn-warning btn-sm">
-                   Edit
+                    Edit
                 </a>
 
-                <a href="/delete_traveller/{{ traveller[0] }}"
-                   class="btn btn-danger btn-sm">
-                   Delete
-                </a>
+                <form action="{{ url_for('delete_traveller', id=traveller['id']) }}"
+                      method="POST"
+                      style="display:inline;">
+
+                    <button type="submit"
+                            class="btn btn-danger btn-sm"
+                            onclick="return confirm('Delete this traveller?')">
+                        Delete
+                    </button>
+
+                </form>
             </td>
         </tr>
-    {% endfor %}
+        {% endfor %}
 
     </tbody>
 
