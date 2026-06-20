@@ -1,19 +1,77 @@
+
 {% extends 'base.html' %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
 
-<div class="text-center">
-    <h1>Welcome to AI Trip Planner</h1>
-    <p>Plan your dream trip with AI.</p>
+<div class="container py-5">
 
-    <a href="{{ url_for('planner') }}" class="btn btn-primary">
-        Start Planning
-    </a>
-    <a href="{{ url_for('add_traveller') }}" class="btn btn-primary">
-    Add Traveller
-</a>
+    <div class="text-center">
+
+        <h1 class="display-3 fw-bold text-primary mb-3">
+            ✈️ AI Trip Planner
+        </h1>
+
+        <p class="lead text-muted mb-4">
+            Plan your dream trip with AI-powered recommendations,
+            budget tracking, and smart itineraries.
+        </p>
+
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+
+            <a href="{{ url_for('planner') }}"
+               class="btn btn-primary btn-lg px-4">
+                🚀 Start Planning
+            </a>
+
+            <a href="{{ url_for('add_traveller') }}"
+               class="btn btn-outline-success btn-lg px-4">
+                👥 Add Traveller
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="row mt-5 g-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <h3>🤖 AI Suggestions</h3>
+                    <p>
+                        Get personalized destination and itinerary
+                        recommendations.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <h3>💰 Budget Tracking</h3>
+                    <p>
+                        Estimate and manage your travel expenses easily.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <h3>🗺️ Smart Itinerary</h3>
+                    <p>
+                        Organize destinations, hotels, and activities in one place.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
 
 {% endblock %}

@@ -129,6 +129,7 @@ def filter_trips():
 
     destination = request.args.get("destination", "")
     budget = request.args.get("budget", "")
+    days = request.args.get("days", "")
 
     conn = get_db()
 
@@ -141,10 +142,12 @@ def filter_trips():
     query = "SELECT * FROM travellers WHERE 1=1"
     params = []
 
+    # Destination filter
     if destination:
         query += " AND destination = ?"
         params.append(destination)
 
+    # Budget filter
     if budget == "low":
         query += " AND budget < 10000"
 
@@ -153,6 +156,16 @@ def filter_trips():
 
     elif budget == "high":
         query += " AND budget > 50000"
+
+    # Days filter
+    if days == "1-3":
+        query += " AND days BETWEEN 1 AND 3"
+
+    elif days == "4-7":
+        query += " AND days BETWEEN 4 AND 7"
+
+    elif days == "8+":
+        query += " AND days >= 8"
 
     travellers = conn.execute(query, params).fetchall()
 
@@ -163,7 +176,8 @@ def filter_trips():
         travellers=travellers,
         destinations=destinations,
         selected_destination=destination,
-        selected_budget=budget
+        selected_budget=budget,
+        selected_days=days
     )
 
 

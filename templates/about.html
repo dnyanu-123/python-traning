@@ -1,6 +1,10 @@
 ABOUT.HTML
 
+{% extends 'base.html' %}
 
+{% block title %}About {% endblock %}
+
+{% block content %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,15 +15,15 @@ ABOUT.HTML
 
     <style>
         *{
-            margin:1;
-            padding:1;
+            margin:-2;
+            padding:-20;
             box-sizing:border-box;
             font-family: Arial, sans-serif;
         }
 
         body{
             background:#f4f7fc;
-            color:rgb(247, 18, 140);
+            color:rgb(178, 19, 114);
             line-height:1.6;
         }
 
@@ -42,15 +46,15 @@ ABOUT.HTML
         }
 
         .card{
-            background:rgb(19, 155, 112);
+            background:rgb(190, 226, 217);
             padding:30px;
             border-radius:12px;
-            box-shadow:0 4px 12px rgba(27, 67, 196, 0.1);
+            box-shadow:0 4px 12px rgba(17, 17, 17, 0.1);
             margin-bottom:25px;
         }
 
         h2{
-            color:#b1103b7d;
+            color:#17050a7d;
             margin-bottom:15px;
         }
 
@@ -74,14 +78,14 @@ ABOUT.HTML
 
         footer{
             background:#222;
-            color:white;
+            color:rgb(44, 42, 42);
             text-align:center;
             padding:15px;
             margin-top:40px;
         }
 
         .highlight{
-            color:#c05c73;
+            color:#170c7b;
             font-weight:bold;
         }
     </style>
@@ -172,3 +176,5 @@ ABOUT.HTML
 
 </body>
 </html>
+
+{% endblock %}
