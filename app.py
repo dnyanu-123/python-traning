@@ -1,44 +1,100 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import sqlite3
 
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    logout_user,
+    login_required,
+    current_user
+)
+
+from werkzeug.security import (
+    generate_password_hash,
+    check_password_hash
+)
+
 app = Flask(__name__)
 app.secret_key = "traveller_secret_key"
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 def get_db():
     conn = sqlite3.connect("trip_planner.db")
     conn.row_factory = sqlite3.Row
     return conn
 
+class User(UserMixin):
+
+    def __init__(self, id, username, email, password):
+        self.id = id
+        self.username = username
+        self.email = email
+        self.password = password
 
 def init_db():
+    print("init_db is running...")
+
     conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS travellers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
         name TEXT,
         age INTEGER,
         email TEXT,
         contact_no TEXT,
         destination TEXT,
         days INTEGER,
-        budget REAL
+        budget REAL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     )
     """)
 
     conn.commit()
     conn.close()
 
-
-init_db()
-
+    print("Database initialized successfully")
 
 @app.route("/")
 def home():
     return render_template("home.html")
 
+@login_manager.user_loader
+def load_user(user_id):
+
+    conn = get_db()
+
+    user = conn.execute(
+        "SELECT * FROM users WHERE id = ?",
+        (user_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if user:
+        return User(
+            user["id"],
+            user["username"],
+            user["email"],
+            user["password"]
+        )
+
+    return None
 
 @app.route("/about")
 def about():
@@ -50,7 +106,92 @@ def contact():
     return render_template("contact.html")
 
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    if request.method == "POST":
+
+        username = request.form["username"]
+        email = request.form["email"]
+
+        password = generate_password_hash(
+            request.form["password"]
+        )
+
+        conn = get_db()
+
+        existing_user = conn.execute(
+            "SELECT * FROM users WHERE username = ? OR email = ?",
+            (username, email)
+        ).fetchone()
+
+        if existing_user:
+            flash("Username or email already registered", "danger")
+            conn.close()
+            return redirect(url_for("register"))
+
+        conn.execute("""
+            INSERT INTO users
+            (username, email, password)
+            VALUES (?, ?, ?)
+        """, (username, email, password))
+
+        conn.commit()
+        conn.close()
+
+        flash("Registration successful!", "success")
+
+        return redirect(url_for("login"))
+
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+
+        email = request.form["email"]
+        password = request.form["password"]
+
+        conn = get_db()
+
+        user = conn.execute(
+            "SELECT * FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
+
+        conn.close()
+
+        if user and check_password_hash(
+            user["password"],
+            password
+        ):
+
+            login_user(User(
+                user["id"],
+                user["username"],
+                user["email"],
+                user["password"]
+            ))
+
+            return redirect(url_for("planner"))
+
+        flash("Invalid email or password", "danger")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+
+    logout_user()
+
+    return redirect(url_for("login"))
+
+
 @app.route("/add_traveller", methods=["GET", "POST"])
+@login_required
 def add_traveller():
 
     if request.method == "POST":
@@ -60,9 +201,10 @@ def add_traveller():
 
         cursor.execute("""
             INSERT INTO travellers
-            (name, age, email, contact_no, destination, days, budget)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (user_id, name, age, email, contact_no, destination, days, budget)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
+            current_user.id,
             request.form["name"],
             request.form["age"],
             request.form["email"],
@@ -79,16 +221,17 @@ def add_traveller():
 
     return render_template("add_traveller.html")
 
-
 @app.route("/planner")
+@login_required
 def planner():
 
     conn = get_db()
 
     travellers = conn.execute("""
         SELECT * FROM travellers
+        WHERE user_id = ?
         ORDER BY id DESC
-    """).fetchall()
+    """, (current_user.id,)).fetchall()
 
     conn.close()
 
@@ -99,7 +242,6 @@ def planner():
         travellers=travellers,
         total_travellers=total_travellers
     )
-
 
 @app.route("/search")
 def search():
@@ -246,4 +388,5 @@ def edit_traveller(id):
 
 
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
