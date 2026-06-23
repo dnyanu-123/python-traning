@@ -39,6 +39,14 @@
     <button type="submit" class="btn btn-primary">
         Update Traveller
     </button>
+    <div class="mb-3">
+    <label>Status</label>
 
+    <select name="status" class="form-control">
+        <option value="Planned" {% if traveller['status']=='Planned' %}selected{% endif %}>Planned</option>
+        <option value="Ongoing" {% if traveller['status']=='Ongoing' %}selected{% endif %}>Ongoing</option>
+        <option value="Completed" {% if traveller['status']=='Completed' %}selected{% endif %}>Completed</option>
+    </select>
+</div>
 </form>
 ```

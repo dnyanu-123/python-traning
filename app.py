@@ -200,21 +200,23 @@ def add_traveller():
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO travellers
-            (user_id, name, age, email, contact_no, destination, days, budget)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            current_user.id,
-            request.form["name"],
-            request.form["age"],
-            request.form["email"],
-            request.form["contact_no"],
-            request.form["destination"],
-            request.form["days"],
-            request.form["budget"]
-        ))
+    INSERT INTO travellers
+    (user_id, name, age, email, contact_no, destination, days, budget, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+""", (
+    current_user.id,
+    request.form["name"],
+    request.form["age"],
+    request.form["email"],
+    request.form["contact_no"],
+    request.form["destination"],
+    request.form["days"],
+    request.form["budget"],
+    request.form["status"]
+))
 
         conn.commit()
+        flash("Traveller added successfully!", "success")
         conn.close()
 
         return redirect(url_for("planner"))
@@ -356,7 +358,8 @@ def edit_traveller(id):
                 contact_no = ?,
                 destination = ?,
                 days = ?,
-                budget = ?
+                budget = ?,
+                status = ?
             WHERE id = ?
         """, (
             request.form["name"],
@@ -366,6 +369,7 @@ def edit_traveller(id):
             request.form["destination"],
             request.form["days"],
             request.form["budget"],
+            request.form["status"],
             id
         ))
 
@@ -385,7 +389,6 @@ def edit_traveller(id):
         "edit_traveller.html",
         traveller=traveller
     )
-
 
 if __name__ == "__main__":
     init_db()
