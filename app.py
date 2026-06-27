@@ -1,4 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+#------------------------import sections-----------------------
+
+
+from flask import Flask, render_template, request, redirect, url_for, flash, abort
+
+
 import sqlite3
 
 from flask_login import (
@@ -29,11 +34,14 @@ def get_db():
 
 class User(UserMixin):
 
-    def __init__(self, id, username, email, password):
+    def __init__(self, id, username, email, password, role):
         self.id = id
         self.username = username
         self.email = email
         self.password = password
+        self.role = role
+#**************************database initialization**************************
+
 
 def init_db():
     print("init_db is running...")
@@ -46,7 +54,8 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        role TEXT DEFAULT 'user'
     )
     """)
 
@@ -91,7 +100,8 @@ def load_user(user_id):
             user["id"],
             user["username"],
             user["email"],
-            user["password"]
+            user["password"],
+            user["role"]
         )
 
     return None
@@ -105,7 +115,7 @@ def about():
 def contact():
     return render_template("contact.html")
 
-
+#**************************Register section**************************
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -132,9 +142,9 @@ def register():
 
         conn.execute("""
             INSERT INTO users
-            (username, email, password)
-            VALUES (?, ?, ?)
-        """, (username, email, password))
+            (username, email, password, role)
+            VALUES (?, ?, ?, ?)
+        """, (username, email, password, "user"))
 
         conn.commit()
         conn.close()
@@ -144,6 +154,9 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html")
+
+
+#**************************Login section**************************
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -171,7 +184,8 @@ def login():
                 user["id"],
                 user["username"],
                 user["email"],
-                user["password"]
+                user["password"],
+                user["role"]
             ))
 
             return redirect(url_for("planner"))
@@ -180,6 +194,7 @@ def login():
 
     return render_template("login.html")
 
+#**************************logout section****************************
 
 @app.route("/logout")
 @login_required
@@ -189,11 +204,14 @@ def logout():
 
     return redirect(url_for("login"))
 
+#**************************Add traveller section**************************
 
 @app.route("/add_traveller", methods=["GET", "POST"])
 @login_required
 def add_traveller():
-
+    if current_user.role != "admin":
+        abort(403)  # Forbidden access for non-admin users
+    
     if request.method == "POST":
 
         conn = get_db()
@@ -223,6 +241,9 @@ def add_traveller():
 
     return render_template("add_traveller.html")
 
+#*******************************Planner section****************************
+
+
 @app.route("/planner")
 @login_required
 def planner():
@@ -244,6 +265,8 @@ def planner():
         travellers=travellers,
         total_travellers=total_travellers
     )
+
+#********************************Search section***********************************
 
 @app.route("/search")
 def search():
@@ -267,6 +290,7 @@ def search():
         query=q
     )
 
+#******************************Filter section*******************************
 
 @app.route("/filter")
 def filter_trips():
@@ -324,10 +348,14 @@ def filter_trips():
         selected_days=days
     )
 
+#****************************Delete section******************************
 
 @app.route("/delete/<int:id>", methods=["POST"])
 def delete_traveller(id):
 
+    if current_user.role != "admin":
+        abort(403)
+        
     conn = get_db()
 
     conn.execute(
@@ -342,9 +370,13 @@ def delete_traveller(id):
 
     return redirect(url_for("planner"))
 
+#****************************Edit section******************************
 
 @app.route("/edit_traveller/<int:id>", methods=["GET", "POST"])
 def edit_traveller(id):
+
+    if current_user.role != "admin":
+        abort(403)
 
     conn = get_db()
 
