@@ -251,10 +251,14 @@ def planner():
     conn = get_db()
 
     travellers = conn.execute("""
-        SELECT * FROM travellers
-        WHERE user_id = ?
-        ORDER BY id DESC
-    """, (current_user.id,)).fetchall()
+        SELECT
+            travellers.*,
+            users.username
+        FROM travellers
+        INNER JOIN users
+        ON travellers.user_id = users.id
+        ORDER BY travellers.id DESC
+    """).fetchall()
 
     conn.close()
 
@@ -265,7 +269,6 @@ def planner():
         travellers=travellers,
         total_travellers=total_travellers
     )
-
 #********************************Search section***********************************
 
 @app.route("/search")
@@ -421,6 +424,34 @@ def edit_traveller(id):
         "edit_traveller.html",
         traveller=traveller
     )
+
+#*******************************RELATIONSHIP_DEMO****************************************
+'''@app.route("/relationship_demo")
+@login_required
+def relationship_demo():
+
+    conn = get_db()
+
+    travellers_raw = conn.execute("""
+        SELECT id, name, user_id
+        FROM travellers
+    """).fetchall()
+
+    travellers_joined = conn.execute("""
+        SELECT
+            travellers.name AS traveller_name,
+            users.username
+        FROM travellers
+        INNER JOIN users
+        ON travellers.user_id = users.id
+    """).fetchall()
+
+    return render_template(
+        "relationship_demo.html",
+        travellers_raw=travellers_raw,
+        travellers_joined=travellers_joined
+    )'''
+
 
 if __name__ == "__main__":
     init_db()

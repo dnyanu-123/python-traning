@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relationship Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand">Traveller Relationship Demo</span>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="row">
+
+        <!-- Without JOIN -->
+        <div class="col-md-6">
+            <h4>Travellers (Without JOIN)</h4>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Traveller Name</th>
+                        <th>User ID</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for t in travellers_raw %}
+                    <tr>
+                        <td>{{ t.id }}</td>
+                        <td>{{ t.name }}</td>
+                        <td>{{ t.user_id }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <p class="text-muted">
+                Only User ID is shown.
+            </p>
+        </div>
+
+        <!-- With JOIN -->
+        <div class="col-md-6">
+            <h4>Travellers (With JOIN)</h4>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Traveller Name</th>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for t in travellers_joined %}
+                    <tr>
+                        <td>{{ t.traveller_name }}</td>
+                        <td>{{ t.username }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <p class="text-muted">
+                JOIN converts User ID into Username.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
