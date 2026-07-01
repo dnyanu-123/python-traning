@@ -1,60 +1,54 @@
 {% extends "base.html" %}
 
+{% block title %}Search{% endblock %}
+
 {% block content %}
 
 <div class="container mt-4">
 
-    <h2>Search Trips</h2>
+    <h2 class="text-center mb-4">Search Travellers</h2>
 
-    <form method="GET" action="{{ url_for('search') }}" class="mb-3">
+    <form method="POST" class="mb-3">
 
-        <input
-            type="text"
-            name="q"
-            class="form-control"
-            placeholder="Search by traveller or destination"
-            value="{{ query }}"
-        >
+        <input type="text"
+               name="query"
+               class="form-control"
+               placeholder="Search by name or destination"
+               required>
+
+        <button class="btn btn-primary mt-2">
+            Search
+        </button>
 
     </form>
 
-    {% if travellers %}
+    <table class="table table-bordered">
 
-        <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Email</th>
+                <th>Destination</th>
+                <th>Created By</th>
+            </tr>
+        </thead>
 
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Destination</th>
-                    <th>Budget</th>
-                    <th>Days</th>
-                </tr>
-            </thead>
+        <tbody>
 
-            <tbody>
+            {% for t in results %}
+            <tr>
+                <td>{{ t['name'] }}</td>
+                <td>{{ t['age'] }}</td>
+                <td>{{ t['email'] }}</td>
+                <td>{{ t['destination'] }}</td>
+                <td>{{ t['username'] }}</td>
+            </tr>
+            {% endfor %}
 
-                {% for traveller in travellers %}
+        </tbody>
 
-                <tr>
-                    <td>{{ traveller["name"] }}</td>
-                    <td>{{ traveller["destination"] }}</td>
-                    <td>{{ traveller["budget"] }}</td>
-                    <td>{{ traveller["days"] }}</td>
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    {% elif query %}
-
-        <div class="alert alert-warning">
-            No trips found for "{{ query }}"
-        </div>
-
-    {% endif %}
+    </table>
 
 </div>
 

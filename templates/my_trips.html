@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}My Trips{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<h2 class="text-center mb-4">My Trips</h2>
+
+<a href="{{ url_for('add_trip') }}" class="btn btn-success mb-3">
+    + Add New Trip
+</a>
+
+<table class="table table-bordered table-striped">
+
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Trip Name</th>
+            <th>Destination</th>
+            <th>Travel Date</th>
+            <th>Days</th>
+            <th>Budget</th>
+            <th>Transport</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for trip in trips %}
+        <tr>
+
+            <td>{{ trip['id'] }}</td>
+            <td>{{ trip['trip_name'] }}</td>
+            <td>{{ trip['destination'] }}</td>
+            <td>{{ trip['travel_date'] }}</td>
+            <td>{{ trip['days'] }}</td>
+            <td>₹{{ trip['budget'] }}</td>
+            <td>{{ trip['transport'] }}</td>
+            <td>
+                <span class="badge bg-info">
+                    {{ trip['status'] }}
+                </span>
+            </td>
+
+            <td>
+
+                <!-- Edit -->
+                <a href="#" class="btn btn-warning btn-sm">
+                    Edit
+                </a>
+
+                <!-- Delete -->
+                <a href="#" class="btn btn-danger btn-sm">
+                    Delete
+                </a>
+
+            </td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

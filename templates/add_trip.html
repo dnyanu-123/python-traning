@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Add Trip{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+            <h3>Add New Trip</h3>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                <div class="mb-3">
+                    <label class="form-label">Trip Name</label>
+                    <input type="text" name="trip_name" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Destination</label>
+                    <input type="text" name="destination" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Travel Date</label>
+                    <input type="date" name="travel_date" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Days</label>
+                    <input type="number" name="days" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Budget</label>
+                    <input type="number" name="budget" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Transport</label>
+
+                    <select name="transport" class="form-control">
+                        <option value="Bus">Bus</option>
+                        <option value="Train">Train</option>
+                        <option value="Flight">Flight</option>
+                        <option value="Car">Car</option>
+                    </select>
+
+                </div>
+
+                <button class="btn btn-success">
+                    Add Trip
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

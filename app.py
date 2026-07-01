@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, abo
 
 import sqlite3
 
+
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -140,11 +141,17 @@ def register():
             conn.close()
             return redirect(url_for("register"))
 
+        admin_exists = conn.execute(
+        "SELECT * FROM users WHERE role = 'admin'"
+        ).fetchone()
+
+        role = "admin" if admin_exists is None else "user"
+
         conn.execute("""
             INSERT INTO users
             (username, email, password, role)
             VALUES (?, ?, ?, ?)
-        """, (username, email, password, "user"))
+        """, (username, email, password, "role"))
 
         conn.commit()
         conn.close()
@@ -206,43 +213,110 @@ def logout():
 
 #**************************Add traveller section**************************
 
+
 @app.route("/add_traveller", methods=["GET", "POST"])
 @login_required
 def add_traveller():
-    if current_user.role != "admin":
-        abort(403)  # Forbidden access for non-admin users
-    
+
+    conn = get_db()
+
     if request.method == "POST":
 
-        conn = get_db()
-        cursor = conn.cursor()
+        # admin can assign user_id manually (optional)
+        if current_user.role == "admin":
+            user_id = request.form.get("user_id", current_user.id)
+        else:
+            # normal user can only add for self
+            user_id = current_user.id
 
-        cursor.execute("""
-    INSERT INTO travellers
-    (user_id, name, age, email, contact_no, destination, days, budget, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-""", (
-    current_user.id,
-    request.form["name"],
-    request.form["age"],
-    request.form["email"],
-    request.form["contact_no"],
-    request.form["destination"],
-    request.form["days"],
-    request.form["budget"],
-    request.form["status"]
-))
+        # Check if traveller profile already exists
+        existing = conn.execute(
+            "SELECT id FROM travellers WHERE user_id = ?",
+            (user_id,)
+        ).fetchone()
+
+        if existing:
+            conn.close()
+            flash("Traveller Profile Already Exists!", "warning")
+            return redirect(url_for("planner"))
+
+        conn.execute("""
+            INSERT INTO travellers
+            (user_id, name, age, email, contact_no )
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            user_id,
+            request.form["name"],
+            request.form["age"],
+            request.form["email"],
+            request.form["contact_no"]
+        ))
 
         conn.commit()
-        flash("Traveller added successfully!", "success")
         conn.close()
 
+        flash("Traveller added successfully!", "success")
         return redirect(url_for("planner"))
 
+    conn.close()
     return render_template("add_traveller.html")
 
-#*******************************Planner section****************************
+#*********************************************ADD TRIP SECTION**********************************************
+@app.route("/add_trip", methods=["GET", "POST"])
+@login_required
+def add_trip():
 
+    conn = get_db()
+
+    # Logged-in user ki traveller profile nikalo
+    traveller = conn.execute("""
+        SELECT id
+        FROM travellers
+        WHERE user_id = ?
+    """, (current_user.id,)).fetchone()
+
+    if not traveller:
+        flash("Please create your traveller profile first.", "warning")
+        conn.close()
+        return redirect(url_for("add_traveller"))
+
+    if request.method == "POST":
+
+        conn.execute("""
+            INSERT INTO trips
+            (
+                traveller_id,
+                trip_name,
+                destination,
+                travel_date,
+                days,
+                budget,
+                transport
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+
+            traveller["id"],
+
+            request.form["trip_name"],
+            request.form["destination"],
+            request.form["travel_date"],
+            request.form["days"],
+            request.form["budget"],
+            request.form["transport"]
+
+        ))
+
+        conn.commit()
+        conn.close()
+
+        flash("Trip added successfully!", "success")
+        return redirect(url_for("planner"))
+
+    conn.close()
+    return render_template("add_trip.html")
+
+#*******************************Planner section****************************
 
 @app.route("/planner")
 @login_required
@@ -250,49 +324,84 @@ def planner():
 
     conn = get_db()
 
-    travellers = conn.execute("""
-        SELECT
-            travellers.*,
-            users.username
-        FROM travellers
-        INNER JOIN users
-        ON travellers.user_id = users.id
-        ORDER BY travellers.id DESC
-    """).fetchall()
+    # ADMIN → see all travellers
+    if current_user.role == "admin":
+
+        travellers = conn.execute("""
+            SELECT
+                travellers.*,
+                users.username
+            FROM travellers
+            INNER JOIN users
+                ON travellers.user_id = users.id
+            ORDER BY travellers.id ASC
+        """).fetchall()
+
+    # NORMAL USER → see only own traveller profile
+    else:
+
+        travellers = conn.execute("""
+            SELECT
+                travellers.*,
+                users.username
+            FROM travellers
+            INNER JOIN users
+                ON travellers.user_id = users.id
+            WHERE travellers.user_id = ?
+            ORDER BY travellers.id DESC
+        """, (current_user.id,)).fetchall()
 
     conn.close()
-
-    total_travellers = len(travellers)
 
     return render_template(
         "planner.html",
         travellers=travellers,
-        total_travellers=total_travellers
+        total_travellers=len(travellers)
     )
-#********************************Search section***********************************
-
-@app.route("/search")
-def search():
-
-    q = request.args.get("q", "")
+    
+#*********************************************MY TRIPS SECTION**********************************************
+@app.route("/my_trips")
+@login_required
+def my_trips():
 
     conn = get_db()
 
-    travellers = conn.execute("""
-        SELECT * FROM travellers
-        WHERE name LIKE ?
-        OR destination LIKE ?
-        ORDER BY id DESC
-    """, (f"%{q}%", f"%{q}%")).fetchall()
+    # ADMIN → see ALL trips
+    if current_user.role == "admin":
+
+        trips = conn.execute("""
+            SELECT
+                trips.*,
+                travellers.name
+            FROM trips
+            INNER JOIN travellers
+                ON trips.traveller_id = travellers.id
+            ORDER BY trips.id DESC
+        """).fetchall()
+
+    # NORMAL USER → see only own trips
+    else:
+
+        traveller = conn.execute("""
+            SELECT id
+            FROM travellers
+            WHERE user_id = ?
+        """, (current_user.id,)).fetchone()
+
+        if not traveller:
+            conn.close()
+            return render_template("my_trips.html", trips=[])
+
+        trips = conn.execute("""
+            SELECT *
+            FROM trips
+            WHERE traveller_id = ?
+            ORDER BY id DESC
+        """, (traveller["id"],)).fetchall()
 
     conn.close()
 
-    return render_template(
-        "search.html",
-        travellers=travellers,
-        query=q
-    )
-
+    return render_template("my_trips.html", trips=trips)
 #******************************Filter section*******************************
 
 @app.route("/filter")
@@ -350,15 +459,44 @@ def filter_trips():
         selected_budget=budget,
         selected_days=days
     )
+#********************************SEARCH SECTION****************************
+@app.route("/search", methods=["GET", "POST"])
+@login_required
+def search():
 
+    conn = get_db()
+    results = []
+
+    if request.method == "POST":
+        query = request.form["query"]
+
+        results = conn.execute("""
+            SELECT
+                travellers.*,
+                users.username
+            FROM travellers
+            INNER JOIN users
+                ON travellers.user_id = users.id
+            WHERE travellers.name LIKE ?
+               OR travellers.destination LIKE ?
+        """, (f"%{query}%", f"%{query}%")).fetchall()
+
+    conn.close()
+
+    return render_template("search.html", results=results)
 #****************************Delete section******************************
 
-@app.route("/delete/<int:id>", methods=["POST"])
+from flask_login import login_required, current_user
+from flask import abort, redirect, url_for, flash
+
+@app.route("/delete_traveller/<int:id>", methods=["POST"])
+@login_required
 def delete_traveller(id):
 
+    # Only admin can delete
     if current_user.role != "admin":
         abort(403)
-        
+
     conn = get_db()
 
     conn.execute(
@@ -372,6 +510,25 @@ def delete_traveller(id):
     flash("Traveller deleted successfully!", "success")
 
     return redirect(url_for("planner"))
+
+#*******************************delete section***************************
+@app.route("/delete_trip/<int:trip_id>", methods=["POST"])
+@login_required
+def delete_trip(trip_id):
+
+    conn = get_db()
+
+    conn.execute("""
+        DELETE FROM trips
+        WHERE id = ?
+    """, (trip_id,))
+
+    conn.commit()
+    conn.close()
+
+    flash("Trip deleted successfully!", "success")
+
+    return redirect(url_for("my_trips"))
 
 #****************************Edit section******************************
 
@@ -426,7 +583,8 @@ def edit_traveller(id):
     )
 
 #*******************************RELATIONSHIP_DEMO****************************************
-'''@app.route("/relationship_demo")
+
+@app.route("/relationship_demo")
 @login_required
 def relationship_demo():
 
@@ -450,7 +608,7 @@ def relationship_demo():
         "relationship_demo.html",
         travellers_raw=travellers_raw,
         travellers_joined=travellers_joined
-    )'''
+    )
 
 
 if __name__ == "__main__":
