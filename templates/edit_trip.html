@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Trip{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-primary text-white">
+                    <h4>Edit Trip</h4>
+                </div>
+
+                <div class="card-body">
+
+                    <form method="POST">
+
+                        <div class="mb-3">
+                            <label class="form-label">Trip Name</label>
+                            <input
+                                type="text"
+                                name="trip_name"
+                                class="form-control"
+                                value="{{ trip.trip_name }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Destination</label>
+                            <input
+                                type="text"
+                                name="destination"
+                                class="form-control"
+                                value="{{ trip.destination }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Travel Date</label>
+                            <input
+                                type="date"
+                                name="travel_date"
+                                class="form-control"
+                                value="{{ trip.travel_date }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Days</label>
+                            <input
+                                type="number"
+                                name="days"
+                                class="form-control"
+                                value="{{ trip.days }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Budget</label>
+                            <input
+                                type="number"
+                                name="budget"
+                                class="form-control"
+                                value="{{ trip.budget }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Transport</label>
+                            <input
+                                type="text"
+                                name="transport"
+                                class="form-control"
+                                value="{{ trip.transport }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+
+                            <select
+                                name="status"
+                                class="form-select">
+
+                                <option value="Planned"
+                                {% if trip.status=="Planned" %}selected{% endif %}>
+                                Planned
+                                </option>
+
+                                <option value="Ongoing"
+                                {% if trip.status=="Ongoing" %}selected{% endif %}>
+                                Ongoing
+                                </option>
+
+                                <option value="Completed"
+                                {% if trip.status=="Completed" %}selected{% endif %}>
+                                Completed
+                                </option>
+
+                                <option value="Cancelled"
+                                {% if trip.status=="Cancelled" %}selected{% endif %}>
+                                Cancelled
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <button class="btn btn-success">
+                            Update Trip
+                        </button>
+
+                        <a href="{{ url_for('my_trips') }}"
+                           class="btn btn-secondary">
+                            Cancel
+                        </a>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

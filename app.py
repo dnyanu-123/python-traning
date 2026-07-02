@@ -358,7 +358,43 @@ def planner():
         travellers=travellers,
         total_travellers=len(travellers)
     )
-    
+    #***************************************************dashboard section**********************************************
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+
+    conn = get_db()
+
+    total_users = conn.execute("""
+        SELECT COUNT(*) AS count
+        FROM users
+    """).fetchone()["count"]
+
+    total_travellers = conn.execute("""
+        SELECT COUNT(*) AS count
+        FROM travellers
+    """).fetchone()["count"]
+
+    total_trips = conn.execute("""
+        SELECT COUNT(*) AS count
+        FROM trips
+    """).fetchone()["count"]
+
+    total_budget = conn.execute("""
+        SELECT COALESCE(SUM(budget),0) AS total
+        FROM trips
+    """).fetchone()["total"]
+
+    conn.close()
+
+    return render_template(
+        "dashboard.html",
+        total_users=total_users,
+        total_travellers=total_travellers,
+        total_trips=total_trips,
+        total_budget=total_budget
+    )
 #*********************************************MY TRIPS SECTION**********************************************
 @app.route("/my_trips")
 @login_required
@@ -529,6 +565,64 @@ def delete_trip(trip_id):
     flash("Trip deleted successfully!", "success")
 
     return redirect(url_for("my_trips"))
+#************************************************edit trip section**********************************************
+
+@app.route("/edit_trip/<int:trip_id>", methods=["GET", "POST"])
+@login_required
+def edit_trip(trip_id):
+
+    conn = get_db()
+
+    trip = conn.execute("""
+        SELECT *
+        FROM trips
+        WHERE id = ?
+    """, (trip_id,)).fetchone()
+
+    if not trip:
+        conn.close()
+        flash("Trip not found.", "danger")
+        return redirect(url_for("my_trips"))
+
+    if request.method == "POST":
+
+        conn.execute("""
+            UPDATE trips
+            SET
+                trip_name = ?,
+                destination = ?,
+                travel_date = ?,
+                days = ?,
+                budget = ?,
+                transport = ?,
+                status = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (
+
+            request.form["trip_name"],
+            request.form["destination"],
+            request.form["travel_date"],
+            request.form["days"],
+            request.form["budget"],
+            request.form["transport"],
+            request.form["status"],
+            trip_id
+
+        ))
+
+        conn.commit()
+        conn.close()
+
+        flash("Trip updated successfully!", "success")
+        return redirect(url_for("my_trips"))
+
+    conn.close()
+
+    return render_template(
+        "edit_trip.html",
+        trip=trip
+    )
 
 #****************************Edit section******************************
 
@@ -610,6 +704,239 @@ def relationship_demo():
         travellers_joined=travellers_joined
     )
 
+#**************************recommedation section**************************
+@app.route("/recommend_trip", methods=["GET", "POST"])
+@login_required
+def recommend_trip():
+
+    itinerary = ""
+
+    places = {
+
+        "Goa": [
+            "Baga Beach",
+            "Fort Aguada",
+            "Calangute Beach",
+            "Anjuna Market",
+            "Dudhsagar Falls",
+            "Chapora Fort",
+            "Cruise Dinner"
+        ],
+
+        "Manali": [
+            "Mall Road",
+            "Hadimba Temple",
+            "Solang Valley",
+            "Atal Tunnel",
+            "Rohtang Pass",
+            "Jogini Falls",
+            "Local Shopping"
+        ],
+
+        "Kashmir": [
+            "Dal Lake",
+            "Gulmarg",
+            "Mughal Gardens",
+            "Pahalgam",
+            "Sonmarg",
+            "Shankaracharya Temple",
+            "Local Market"
+        ],
+
+        "Jaipur": [
+            "Hawa Mahal",
+            "City Palace",
+            "Amer Fort",
+            "Jal Mahal",
+            "Nahargarh Fort",
+            "Albert Hall Museum",
+            "Local Shopping"
+        ],
+
+        "Kerala": [
+            "Munnar",
+            "Tea Gardens",
+            "Alleppey Houseboat",
+            "Kochi",
+            "Athirapally Falls",
+            "Thekkady",
+            "Beach Visit"
+        ],
+
+        "Ooty": [
+            "Botanical Garden",
+            "Ooty Lake",
+            "Toy Train",
+            "Doddabetta Peak",
+            "Tea Factory",
+            "Rose Garden",
+            "Pykara Lake"
+        ]
+    }
+
+    if request.method == "POST":
+
+        destination = request.form["destination"]
+        budget = int(request.form["budget"])
+        days = int(request.form["days"])
+
+        itinerary = f"Destination: {destination}\n"
+        itinerary += f"Days: {days}\n"
+        itinerary += f"Budget: ₹{budget}\n\n"
+
+        if budget < 10000:
+            itinerary += "Hotel: Budget Hotel\n\n"
+        elif budget < 30000:
+            itinerary += "Hotel: 3-Star Hotel\n\n"
+        else:
+            itinerary += "Hotel: Luxury Resort\n\n"
+
+        activities = places[destination]
+
+        for i in range(days):
+            place = activities[i % len(activities)]
+            itinerary += f"Day {i+1}: Visit {place}\n"
+
+    return render_template(
+        "recommend_trip.html",
+        itinerary=itinerary
+    )
+#***********************************************generate AI section**********************************************
+@app.route("/generate_ai/<int:trip_id>")
+@login_required
+def generate_ai(trip_id):
+
+    conn = get_db()
+
+    trip = conn.execute("""
+        SELECT *
+        FROM trips
+        WHERE id = ?
+    """, (trip_id,)).fetchone()
+
+    if not trip:
+        flash("Trip not found.", "danger")
+        conn.close()
+        return redirect(url_for("my_trips"))
+
+    destination = trip["destination"]
+    days = trip["days"]
+    budget = trip["budget"]
+
+    places = {
+        "Goa": [
+            "Baga Beach",
+            "Fort Aguada",
+            "Calangute Beach",
+            "Anjuna Market",
+            "Dudhsagar Falls",
+            "Chapora Fort",
+            "Cruise Dinner"
+        ],
+        "Manali": [
+            "Mall Road",
+            "Hadimba Temple",
+            "Solang Valley",
+            "Atal Tunnel",
+            "Rohtang Pass",
+            "Jogini Falls",
+            "Local Shopping"
+        ],
+        "Kashmir": [
+            "Dal Lake",
+            "Gulmarg",
+            "Mughal Gardens",
+            "Pahalgam",
+            "Sonmarg",
+            "Shankaracharya Temple",
+            "Local Market"
+        ],
+        "Jaipur": [
+            "Hawa Mahal",
+            "City Palace",
+            "Amer Fort",
+            "Jal Mahal",
+            "Nahargarh Fort",
+            "Albert Hall Museum",
+            "Local Shopping"
+        ],
+        "Kerala": [
+            "Munnar",
+            "Tea Gardens",
+            "Alleppey Houseboat",
+            "Kochi",
+            "Athirapally Falls",
+            "Thekkady",
+            "Beach Visit"
+        ],
+        "Ooty": [
+            "Botanical Garden",
+            "Ooty Lake",
+            "Toy Train",
+            "Doddabetta Peak",
+            "Tea Factory",
+            "Rose Garden",
+            "Pykara Lake"
+        ],
+        "Nagpur": [
+            "Deekshabhoomi",
+            "Futala Lake",
+            "Ambazari Lake",
+            "Maharajbag Zoo",
+            "Dragon Palace Temple",
+            "Sitabuldi Fort",
+            "Zero Mile Stone"
+                ],
+
+        "Pune": [
+            "Shaniwar Wada",
+            "Aga Khan Palace",
+            "Sinhagad Fort",
+            "Khadakwasla Dam",
+            "Phoenix Mall",
+            "Saras Baug",
+            "FC Road"
+        ],
+
+        "Mumbai": [
+            "Gateway of India",
+            "Marine Drive",
+            "Juhu Beach",
+            "Elephanta Caves",
+            "Bandra Bandstand",
+            "Colaba Causeway",
+            "Siddhivinayak Temple"
+]
+}
+
+    itinerary = f"Destination: {destination}\n"
+    itinerary += f"Days: {days}\n"
+    itinerary += f"Budget: ₹{budget}\n\n"
+
+    if budget < 10000:
+        itinerary += "Hotel: Budget Hotel\n\n"
+    elif budget < 30000:
+        itinerary += "Hotel: 3-Star Hotel\n\n"
+    else:
+        itinerary += "Hotel: Luxury Resort\n\n"
+
+    activities = places.get(destination, ["Explore Local Attractions"])
+
+    for i in range(days):
+        itinerary += f"Day {i+1}: Visit {activities[i % len(activities)]}\n"
+
+    conn.execute("""
+        UPDATE trips
+        SET ai_itinerary = ?
+        WHERE id = ?
+    """, (itinerary, trip_id))
+
+    conn.commit()
+    conn.close()
+
+    flash("AI itinerary generated successfully!", "success")
+
+    return redirect(url_for("my_trips"))
 
 if __name__ == "__main__":
     init_db()

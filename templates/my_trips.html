@@ -49,17 +49,48 @@
             <td>
 
                 <!-- Edit -->
-                <a href="#" class="btn btn-warning btn-sm">
+               
+                <a href="{{ url_for('edit_trip', trip_id=trip.id) }}"
+                    class="btn btn-warning btn-sm">
                     Edit
                 </a>
 
+                <a href="{{ url_for('generate_ai', trip_id=trip.id) }}"
+                     class="btn btn-primary btn-sm">
+                    🤖 Generate AI
+                </a>
+
                 <!-- Delete -->
-                <a href="#" class="btn btn-danger btn-sm">
+                <a href="{{ url_for('delete_trip', trip_id=trip.id) }}"
+                   class="btn btn-danger btn-sm">
                     Delete
                 </a>
 
             </td>
 
+        </tr>
+        <tr>
+    <td colspan="9">
+
+        {% if trip['ai_itinerary'] %}
+
+            <div class="alert alert-success mb-0">
+
+                <h6>🤖 AI Recommended Itinerary</h6>
+
+                <pre>{{ trip['ai_itinerary'] }}</pre>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-warning mb-0">
+                No AI itinerary generated yet.
+            </div>
+
+        {% endif %}
+
+        </td>
         </tr>
         {% endfor %}
 

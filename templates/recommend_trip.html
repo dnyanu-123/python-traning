@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow p-4">
+
+        <h2 class="text-center mb-4">
+            🤖 AI Trip Recommendation
+        </h2>
+
+        <form method="POST">
+
+            <div class="mb-3">
+                <label class="form-label">Destination</label>
+
+                <select name="destination" class="form-control" required>
+
+                    <option value="">Select Destination</option>
+
+                    <option>Goa</option>
+                    <option>Manali</option>
+                    <option>Kashmir</option>
+                    <option>Jaipur</option>
+                    <option>Kerala</option>
+                    <option>Ooty</option>
+
+                </select>
+
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Budget (₹)</label>
+
+                <input
+                    type="number"
+                    class="form-control"
+                    name="budget"
+                    required>
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Number of Days
+                </label>
+
+                <input
+                    type="number"
+                    class="form-control"
+                    name="days"
+                    required>
+
+            </div>
+
+            <button class="btn btn-primary w-100">
+                Generate Recommendation
+            </button>
+
+        </form>
+        {% if itinerary %}
+
+        <hr>
+
+        <h4 class="mt-4">🤖 AI Recommended Itinerary</h4>
+
+        <pre class="bg-light p-3 rounded">{{ itinerary }}</pre>
+
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
