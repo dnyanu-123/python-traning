@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Planner{% endblock %}
 
@@ -6,121 +6,154 @@
 
 <div class="container mt-4">
 
-<h1 class="text-center mb-5">AI Trip Planner</h1>
+    <!-- HEADER -->
+    <div class="text-center mb-4">
 
-<!-- Dashboard -->
-<div class="row mb-4">
+        <h2 class="fw-bold text-primary">
+            ✈️ AI Trip Planner
+        </h2>
 
-    <div class="col-md-4">
-        <div class="card shadow text-center p-3 bg-primary text-white">
-            <h6>Total Travellers</h6>
-            <h2>{{ total_travellers }}</h2>
+        <p class="text-muted">
+            Manage travellers and start planning your journeys
+        </p>
+
+        <!-- ACTION BUTTONS -->
+        <div class="mt-3">
+
+            <a href="{{ url_for('add_trip') }}" class="btn btn-primary">
+                ➕ Create New Trip
+            </a>
+
+            <a href="{{ url_for('my_trips') }}" class="btn btn-dark ms-2">
+                🧳 My Trips
+            </a>
+
         </div>
+
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow text-center p-3 bg-success text-white">
-            <h5>Trip Planner</h5>
-            <h2>Active</h2>
+    <!-- TOP CARDS -->
+    <div class="row mb-4">
+
+        <div class="col-md-6 mb-3">
+            <div class="card bg-primary text-white text-center p-4 shadow">
+                <i class="bi bi-people-fill display-6"></i>
+                <h5>Total Travellers</h5>
+                <h2>{{ total_travellers }}</h2>
+            </div>
         </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card bg-success text-white text-center p-4 shadow">
+                <i class="bi bi-airplane-fill display-6"></i>
+                <h5>Trip Planner</h5>
+                <h2>Active</h2>
+            </div>
+        </div>
+
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow text-center p-3 bg-warning">
-            <h5>Total Records</h5>
-            <h2>{{ total_travellers }}</h2>
+    <!-- SECTION HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h4 class="fw-bold">
+            <i class="bi bi-person-lines-fill"></i>
+            Manage Travellers
+        </h4>
+
+        {% if current_user.role == "admin" %}
+        <a href="{{ url_for('add_traveller') }}" class="btn btn-primary">
+            ➕ Add Traveller
+        </a>
+        {% endif %}
+
+    </div>
+
+    <!-- SEARCH -->
+    <div class="input-group mb-3">
+        <span class="input-group-text">
+            <i class="bi bi-search"></i>
+        </span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search Traveller">
+    </div>
+
+    <!-- TABLE -->
+    <div class="card shadow p-3">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Created By</th>
+                        <th>Add Trip</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for traveller in travellers %}
+                    <tr>
+
+                        <td>{{ traveller['id'] }}</td>
+                        <td>{{ traveller['name'] }}</td>
+                        <td>{{ traveller['age'] }}</td>
+                        <td>{{ traveller['email'] }}</td>
+                        <td>{{ traveller['contact_no'] }}</td>
+                        <td>{{ traveller['username'] }}</td>
+
+                        <td>
+                            <a href="{{ url_for('add_trip') }}" class="btn btn-success btn-sm">
+                                ➕ Add Trip
+                            </a>
+                        </td>
+
+                        <td>
+
+                            {% if current_user.role == "admin" %}
+
+                            <a href="{{ url_for('edit_traveller', id=traveller['id']) }}"
+                               class="btn btn-warning btn-sm">
+                                ✏ Edit
+                            </a>
+
+                            <form action="{{ url_for('delete_traveller', id=traveller['id']) }}"
+                                  method="POST"
+                                  style="display:inline;">
+
+                                <button type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Delete traveller?')">
+                                    🗑 Delete
+                                </button>
+
+                            </form>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
         </div>
+
     </div>
 
 </div>
-   <a href="{{ url_for('my_trips') }}" class="btn btn-dark mb-3">
-    My Trips
-   </a> 
-<h3>Travellers List</h3>
 
-<!-- Add Traveller (only admin) -->
-{% if current_user.role == "admin" %}
-<a href="{{ url_for('add_traveller') }}" class="btn btn-primary mb-3">
-    Add Traveller
-</a>
-{% endif %}
-
-<input
-    type="text"
-    id="searchInput"
-    class="form-control mb-3"
-    placeholder="Search Traveller">
-
-<table class="table table-bordered table-striped table-hover">
-
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Email</th>
-            <th>Contact</th>
-            <th>Created By</th>
-            <th>Add Trip</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-        {% for traveller in travellers %}
-        <tr>
-
-            <td>{{ traveller['id'] }}</td>
-            <td>{{ traveller['name'] }}</td>
-            <td>{{ traveller['age'] }}</td>
-            <td>{{ traveller['email'] }}</td>
-            <td>{{ traveller['contact_no'] }}</td>
-            <td>{{ traveller['username'] }}</td>
-
-            <!-- Add Trip Button -->
-            <td>
-                <a href="{{ url_for('add_trip') }}" class="btn btn-success btn-sm">
-                    Add Trip
-                </a>
-            </td>
-
-            <!-- Actions -->
-            <td>
-
-                {% if current_user.role == "admin" %}
-                <a href="{{ url_for('edit_traveller', id=traveller['id']) }}"
-                   class="btn btn-warning btn-sm">
-                    Edit
-                </a>
-                {% endif %}
-
-                {% if current_user.role == "admin" %}
-                <form action="{{ url_for('delete_traveller', id=traveller['id']) }}"
-                      method="POST"
-                      style="display:inline;">
-
-                    <button type="submit"
-                            class="btn btn-danger btn-sm"
-                            onclick="return confirm('Delete this traveller?')">
-                        Delete
-                    </button>
-
-                </form>
-                {% endif %}
-
-            </td>
-
-        </tr>
-        {% endfor %}
-
-    </tbody>
-
-</table>
-
-</div>
-
-<!-- Search Script -->
+<!-- SEARCH SCRIPT -->
 <script>
 window.onload = function () {
 
@@ -129,18 +162,13 @@ window.onload = function () {
     searchInput.addEventListener("keyup", function () {
 
         let value = searchInput.value.toLowerCase();
-
         let rows = document.querySelectorAll("tbody tr");
 
         rows.forEach(function(row) {
 
             let text = row.innerText.toLowerCase();
 
-            if (text.indexOf(value) > -1) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
+            row.style.display = text.includes(value) ? "" : "none";
 
         });
 

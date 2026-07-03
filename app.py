@@ -41,9 +41,39 @@ class User(UserMixin):
         self.email = email
         self.password = password
         self.role = role
+
+@login_manager.user_loader
+def load_user(user_id):
+    conn = get_db()
+    user = conn.execute(
+        "SELECT * FROM users WHERE id = ?",
+        (user_id,)
+    ).fetchone()
+    conn.close()
+
+    if user:
+        return User(
+            user["id"],
+            user["username"],
+            user["email"],
+            user["password"],
+            user["role"]
+        )
+    return None
+
+@app.route("/")
+def home():
+    return redirect(url_for("login"))
+@app.route("/about")
+
+def about():
+    return render_template("about.html")
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
 #**************************database initialization**************************
-
-
 def init_db():
     print("init_db is running...")
 
@@ -75,47 +105,28 @@ def init_db():
     )
     """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS trips (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        traveller_id INTEGER NOT NULL,
+        trip_name TEXT,
+        destination TEXT,
+        travel_date TEXT,
+        days INTEGER,
+        budget REAL,
+        transport TEXT,
+        status TEXT DEFAULT 'Planned',
+        ai_itinerary TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (traveller_id) REFERENCES travellers(id)
+    )
+    """)
+
     conn.commit()
     conn.close()
 
     print("Database initialized successfully")
-
-@app.route("/")
-def home():
-    return render_template("home.html")
-
-@login_manager.user_loader
-def load_user(user_id):
-
-    conn = get_db()
-
-    user = conn.execute(
-        "SELECT * FROM users WHERE id = ?",
-        (user_id,)
-    ).fetchone()
-
-    conn.close()
-
-    if user:
-        return User(
-            user["id"],
-            user["username"],
-            user["email"],
-            user["password"],
-            user["role"]
-        )
-
-    return None
-
-@app.route("/about")
-def about():
-    return render_template("about.html")
-
-
-@app.route("/contact")
-def contact():
-    return render_template("contact.html")
-
 #**************************Register section**************************
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -151,7 +162,7 @@ def register():
             INSERT INTO users
             (username, email, password, role)
             VALUES (?, ?, ?, ?)
-        """, (username, email, password, "role"))
+        """, (username, email, password, role))
 
         conn.commit()
         conn.close()
@@ -554,34 +565,66 @@ def delete_trip(trip_id):
 
     conn = get_db()
 
-    conn.execute("""
-        DELETE FROM trips
-        WHERE id = ?
-    """, (trip_id,))
+    # Admin can delete any trip
+    if current_user.role == "admin":
+        trip = conn.execute(
+            "SELECT * FROM trips WHERE id=?",
+            (trip_id,)
+        ).fetchone()
+
+    # Normal user can delete only their own trip
+    else:
+        trip = conn.execute("""
+            SELECT trips.*
+            FROM trips
+            JOIN travellers
+            ON trips.traveller_id = travellers.id
+            WHERE trips.id=? AND travellers.user_id=?
+        """, (trip_id, current_user.id)).fetchone()
+
+    if not trip:
+        conn.close()
+        flash("Trip not found or access denied.", "danger")
+        return redirect(url_for("my_trips"))
+
+    conn.execute(
+        "DELETE FROM trips WHERE id=?",
+        (trip_id,)
+    )
 
     conn.commit()
     conn.close()
 
     flash("Trip deleted successfully!", "success")
-
     return redirect(url_for("my_trips"))
 #************************************************edit trip section**********************************************
-
 @app.route("/edit_trip/<int:trip_id>", methods=["GET", "POST"])
 @login_required
 def edit_trip(trip_id):
 
     conn = get_db()
 
-    trip = conn.execute("""
-        SELECT *
-        FROM trips
-        WHERE id = ?
-    """, (trip_id,)).fetchone()
+    # Admin can edit any trip
+    if current_user.role == "admin":
+        trip = conn.execute("""
+            SELECT *
+            FROM trips
+            WHERE id = ?
+        """, (trip_id,)).fetchone()
+
+    # Normal user can edit only their own trip
+    else:
+        trip = conn.execute("""
+            SELECT trips.*
+            FROM trips
+            JOIN travellers
+            ON trips.traveller_id = travellers.id
+            WHERE trips.id = ? AND travellers.user_id = ?
+        """, (trip_id, current_user.id)).fetchone()
 
     if not trip:
         conn.close()
-        flash("Trip not found.", "danger")
+        flash("Trip not found or access denied.", "danger")
         return redirect(url_for("my_trips"))
 
     if request.method == "POST":
@@ -599,7 +642,6 @@ def edit_trip(trip_id):
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         """, (
-
             request.form["trip_name"],
             request.form["destination"],
             request.form["travel_date"],
@@ -608,7 +650,6 @@ def edit_trip(trip_id):
             request.form["transport"],
             request.form["status"],
             trip_id
-
         ))
 
         conn.commit()
@@ -627,6 +668,7 @@ def edit_trip(trip_id):
 #****************************Edit section******************************
 
 @app.route("/edit_traveller/<int:id>", methods=["GET", "POST"])
+@login_required
 def edit_traveller(id):
 
     if current_user.role != "admin":
@@ -819,7 +861,7 @@ def generate_ai(trip_id):
         conn.close()
         return redirect(url_for("my_trips"))
 
-    destination = trip["destination"]
+    destination = trip["destination"].strip().title()
     days = trip["days"]
     budget = trip["budget"]
 
@@ -897,6 +939,15 @@ def generate_ai(trip_id):
             "Saras Baug",
             "FC Road"
         ],
+        "Hyderabad": [
+            "Charminar",
+            "Golconda Fort",
+            "Ramoji Film City",
+            "Hussain Sagar Lake",
+            "Salar Jung Museum",
+            "Birla Mandir",
+            "Laad Bazaar"
+        ],
 
         "Mumbai": [
             "Gateway of India",
@@ -938,6 +989,42 @@ def generate_ai(trip_id):
 
     return redirect(url_for("my_trips"))
 
+
+@app.route("/trip/<int:trip_id>")
+@login_required
+def trip_details(trip_id):
+
+    conn = get_db()
+
+    # Admin can view any trip
+    if current_user.role == "admin":
+        trip = conn.execute("""
+            SELECT trips.*, travellers.name
+            FROM trips
+            JOIN travellers
+            ON trips.traveller_id = travellers.id
+            WHERE trips.id = ?
+        """, (trip_id,)).fetchone()
+
+    # User can view only their own trip
+    else:
+        trip = conn.execute("""
+            SELECT trips.*, travellers.name
+            FROM trips
+            JOIN travellers
+            ON trips.traveller_id = travellers.id
+            WHERE trips.id = ?
+            AND travellers.user_id = ?
+        """, (trip_id, current_user.id)).fetchone()
+
+    conn.close()
+
+    if not trip:
+        flash("Trip not found or access denied.", "danger")
+        return redirect(url_for("my_trips"))
+
+    return render_template("trip_details.html", trip=trip)
 if __name__ == "__main__":
+
     init_db()
     app.run(debug=True)

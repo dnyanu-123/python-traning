@@ -6,97 +6,105 @@
 
 <div class="container mt-4">
 
-<h2 class="text-center mb-4">My Trips</h2>
+    <!-- HEADER -->
+    <div class="text-center mb-4">
 
-<a href="{{ url_for('add_trip') }}" class="btn btn-success mb-3">
-    + Add New Trip
-</a>
+        <h2 class="fw-bold text-primary">
+            🧳 My Trips
+        </h2>
 
-<table class="table table-bordered table-striped">
+        <p class="text-muted">
+            Your travel history and AI-generated itineraries
+        </p>
 
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Trip Name</th>
-            <th>Destination</th>
-            <th>Travel Date</th>
-            <th>Days</th>
-            <th>Budget</th>
-            <th>Transport</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+        <a href="{{ url_for('add_trip') }}" class="btn btn-primary">
+            ➕ Plan New Trip
+        </a>
 
-    <tbody>
+    </div>
+
+    <!-- TRIP LIST -->
+    <div class="row">
 
         {% for trip in trips %}
-        <tr>
 
-            <td>{{ trip['id'] }}</td>
-            <td>{{ trip['trip_name'] }}</td>
-            <td>{{ trip['destination'] }}</td>
-            <td>{{ trip['travel_date'] }}</td>
-            <td>{{ trip['days'] }}</td>
-            <td>₹{{ trip['budget'] }}</td>
-            <td>{{ trip['transport'] }}</td>
-            <td>
-                <span class="badge bg-info">
-                    {{ trip['status'] }}
-                </span>
-            </td>
+        <div class="col-md-4 mb-4">
 
-            <td>
+            <div class="card shadow h-100">
 
-                <!-- Edit -->
-               
-                <a href="{{ url_for('edit_trip', trip_id=trip.id) }}"
-                    class="btn btn-warning btn-sm">
-                    Edit
-                </a>
+                <!-- IMAGE -->
+                <img src="https://source.unsplash.com/400x250/?{{ trip.destination }}"
+                     class="card-img-top"
+                     alt="Trip Image">
 
-                <a href="{{ url_for('generate_ai', trip_id=trip.id) }}"
-                     class="btn btn-primary btn-sm">
-                    🤖 Generate AI
-                </a>
+                <div class="card-body">
 
-                <!-- Delete -->
-                <a href="{{ url_for('delete_trip', trip_id=trip.id) }}"
-                   class="btn btn-danger btn-sm">
-                    Delete
-                </a>
+                    <h5 class="fw-bold text-primary">
+                        📍 {{ trip.destination }}
+                    </h5>
 
-            </td>
+                    <p class="mb-1">
+                        <i class="bi bi-calendar"></i>
+                        {{ trip.travel_date }}
+                    </p>
 
-        </tr>
-        <tr>
-    <td colspan="9">
+                    <p class="mb-1">
+                        <i class="bi bi-clock"></i>
+                        {{ trip.days }} Days
+                    </p>
 
-        {% if trip['ai_itinerary'] %}
+                    <p class="mb-1">
+                        <i class="bi bi-cash"></i>
+                        ₹{{ trip.budget }}
+                    </p>
 
-            <div class="alert alert-success mb-0">
+                    <p class="mb-2">
+                        <i class="bi bi-truck"></i>
+                        {{ trip.transport }}
+                    </p>
 
-                <h6>🤖 AI Recommended Itinerary</h6>
+                    <!-- STATUS -->
+                    <span class="badge bg-success mb-2">
+                        {{ trip.status }}
+                    </span>
 
-                <pre>{{ trip['ai_itinerary'] }}</pre>
+                    <!-- AI ITINERARY -->
+                    <div class="mt-3">
+
+                        <h6 class="text-dark">
+                            🤖 AI Itinerary
+                        </h6>
+
+                        <p class="small text-muted">
+                            {{ trip.itinerary }}
+                        </p>
+
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="mt-3">
+
+                        <a href="https://www.google.com/maps/search/{{ trip.destination }}"
+                           target="_blank"
+                           class="btn btn-sm btn-outline-primary">
+                            📍 View Map
+                        </a>
+
+                        <a href="#" class="btn btn-sm btn-outline-success">
+                            🌤 Weather
+                        </a>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        {% else %}
+        </div>
 
-            <div class="alert alert-warning mb-0">
-                No AI itinerary generated yet.
-            </div>
-
-        {% endif %}
-
-        </td>
-        </tr>
         {% endfor %}
 
-    </tbody>
-
-</table>
+    </div>
 
 </div>
 

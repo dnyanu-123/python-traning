@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow-lg border-0">
+
+        <div class="card-body">
+
+            <h2 class="text-primary">
+                <i class="bi bi-airplane-fill"></i>
+                {{ trip.trip_name }}
+            </h2>
+
+            <h5 class="text-muted">
+                <i class="bi bi-geo-alt-fill"></i>
+                {{ trip.destination }}
+            </h5>
+
+            <hr>
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <p><i class="bi bi-calendar-event"></i>
+                    <strong>Travel Date:</strong>
+                    {{ trip.travel_date }}</p>
+
+                    <p><i class="bi bi-clock"></i>
+                    <strong>Duration:</strong>
+                    {{ trip.days }} Days</p>
+
+                    <p><i class="bi bi-bus-front"></i>
+                    <strong>Transport:</strong>
+                    {{ trip.transport }}</p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <p><i class="bi bi-wallet2"></i>
+                    <strong>Budget:</strong>
+                    ₹{{ trip.budget }}</p>
+
+                    <p><i class="bi bi-person"></i>
+                    <strong>Traveller:</strong>
+                    {{ trip.name }}</p>
+
+                    <p>
+                        <span class="badge bg-success">
+                            {{ trip.status }}
+                        </span>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            🤖 AI Travel Itinerary
+
+        </div>
+
+        <div class="card-body">
+
+            <pre style="white-space: pre-wrap;">{{ trip.ai_itinerary }}</pre>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <a href="{{ url_for('edit_trip', trip_id=trip.id) }}"
+       class="btn btn-warning">
+
+       <i class="bi bi-pencil-square"></i>
+       Edit
+
+    </a>
+
+    <form method="POST"
+          action="{{ url_for('delete_trip', trip_id=trip.id) }}"
+          style="display:inline;">
+
+        <button class="btn btn-danger">
+
+            <i class="bi bi-trash"></i>
+            Delete
+
+        </button>
+
+    </form>
+
+    <a href="{{ url_for('my_trips') }}"
+       class="btn btn-secondary">
+
+        Back
+
+    </a>
+
+</div>
+
+{% endblock %}

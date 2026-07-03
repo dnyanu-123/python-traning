@@ -1,0 +1,68 @@
+/* Background */
+body{
+    background:#f4f7fc;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+/* Navbar */
+.navbar{
+    box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+
+/* Cards */
+.card{
+    border:none;
+    border-radius:15px;
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+
+/* Buttons */
+.btn{
+    border-radius:10px;
+}
+
+.btn:hover{
+    transform:scale(1.03);
+    transition:.3s;
+}
+
+/* Table */
+.table{
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.table tbody tr:hover{
+    background:#eef6ff;
+}
+
+/* Form */
+.form-control,
+.form-select{
+    border-radius:10px;
+}
+
+/* Images */
+img{
+    border-radius:10px;
+}
+
+/* Footer */
+footer{
+    margin-top:70px;
+}
+
+/* Dashboard Numbers */
+.card h2{
+    font-weight:bold;
+}
+
+/* Titles */
+h1,h2,h3,h4{
+    font-weight:bold;
+}
