@@ -3,7 +3,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 
-
+import os
 import sqlite3
 
 
@@ -28,10 +28,21 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+
+import os
+import sqlite3
+
 def get_db():
-    conn = sqlite3.connect("trip_planner.db")
+    if os.name == "nt":   # Windows
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        db_path = os.path.join(BASE_DIR, "trip_planner.db")
+    else:                 # PythonAnywhere/Linux
+        db_path = "/home/Dnyaneshwari2026/ai_trip_planner/trip_planner.db"
+
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 class User(UserMixin):
 
@@ -127,7 +138,9 @@ def init_db():
     conn.close()
 
     print("Database initialized successfully")
+    
 #**************************Register section**************************
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
