@@ -5,7 +5,41 @@
 {% block content %}
 
 <div class="container mt-4">
+    <div class="row mb-4">
 
+    <div class="col-md-3">
+        <div class="card shadow border-0 text-center p-3">
+            <h2 class="text-primary">{{ trips|length }}</h2>
+            <p class="mb-0">Trips Planned</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 text-center p-3">
+            <h2 class="text-success">
+               {{ trips|length }}
+            </h2>
+            <p class="mb-0">Destinations</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 text-center p-3">
+            <h2 class="text-warning">12</h2>
+            <p class="mb-0">Happy Travelers</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 text-center p-3">
+            <h2 class="text-danger">
+                ₹{{ trips|sum(attribute='budget') }}
+            </h2>
+            <p class="mb-0">Total Budget</p>
+        </div>
+    </div>
+
+</div>
     <!-- HEADER -->
     <div class="text-center mb-4">
 
@@ -27,15 +61,39 @@
     <div class="row">
 
         {% for trip in trips %}
-
+        {% if trips %}
+    {% for trip in trips %}
+        ...
+    {% endfor %}
+{% else %}
+<div class="text-center mt-5">
+    <h4>No Trips Found 😔</h4>
+    <a href="{{ url_for('add_trip') }}" class="btn btn-primary">
+        Plan Your First Trip
+    </a>
+</div>
+{% endif %}
         <div class="col-md-4 mb-4">
 
             <div class="card shadow h-100">
 
                 <!-- IMAGE -->
-                <img src="https://source.unsplash.com/400x250/?{{ trip.destination }}"
-                     class="card-img-top"
-                     alt="Trip Image">
+                <div class="position-relative">
+
+        <img src="https://picsum.photos/400/250?random={{ trip.id }}"
+            class="card-img-top"
+            style="height:220px; object-fit:cover;"
+            alt="Trip Image">
+
+    <span class="badge bg-success position-absolute top-0 start-0 m-2">
+        {{ trip.status }}
+    </span>
+
+    <span class="position-absolute top-0 end-0 m-2 fs-4 text-white">
+        🤍
+    </span>
+
+</div>
 
                 <div class="card-body">
 
@@ -76,7 +134,7 @@
                         </h6>
 
                         <p class="small text-muted">
-                            {{ trip.itinerary }}
+                            {{ trip.ai_itinerary }}
                         </p>
 
                     </div>

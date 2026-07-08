@@ -37,7 +37,7 @@ def get_db():
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         db_path = os.path.join(BASE_DIR, "trip_planner.db")
     else:                 # PythonAnywhere/Linux
-        db_path = "/home/Dnyaneshwari2026/ai_trip_planner/trip_planner.db"
+        db_path = "/home/Dnyaneshwari2026/python_training/trip_planner.db"
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
