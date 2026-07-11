@@ -6,6 +6,10 @@ from flask import Flask, render_template, request, redirect, url_for, flash, abo
 import os
 import sqlite3
 
+from dotenv import load_dotenv
+from groq import Groq
+
+
 
 from flask_login import (
     LoginManager,
@@ -20,7 +24,11 @@ from werkzeug.security import (
     generate_password_hash,
     check_password_hash
 )
+load_dotenv()
 
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
+)
 app = Flask(__name__)
 app.secret_key = "traveller_secret_key"
 
@@ -37,7 +45,7 @@ def get_db():
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         db_path = os.path.join(BASE_DIR, "trip_planner.db")
     else:                 # PythonAnywhere/Linux
-        db_path = "/home/Dnyaneshwari2026/python_training/trip_planner.db"
+        db_path = "/home/Dnyaneshwari2026/ai_trip_planner/trip_planner.db"
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -863,137 +871,85 @@ def generate_ai(trip_id):
 
     conn = get_db()
 
-    trip = conn.execute("""
-        SELECT *
-        FROM trips
-        WHERE id = ?
-    """, (trip_id,)).fetchone()
+    # Admin can access any trip
+    if current_user.role == "admin":
+        trip = conn.execute("""
+            SELECT *
+            FROM trips
+            WHERE id = ?
+        """, (trip_id,)).fetchone()
+
+    # Normal user can access only their own trip
+    else:
+        trip = conn.execute("""
+            SELECT trips.*
+            FROM trips
+            JOIN travellers
+            ON trips.traveller_id = travellers.id
+            WHERE trips.id = ?
+            AND travellers.user_id = ?
+        """, (trip_id, current_user.id)).fetchone()
 
     if not trip:
-        flash("Trip not found.", "danger")
         conn.close()
+        flash("Trip not found or access denied.", "danger")
         return redirect(url_for("my_trips"))
 
-    destination = trip["destination"].strip().title()
+    destination = trip["destination"]
     days = trip["days"]
     budget = trip["budget"]
+    transport = trip["transport"]
 
-    places = {
-        "Goa": [
-            "Baga Beach",
-            "Fort Aguada",
-            "Calangute Beach",
-            "Anjuna Market",
-            "Dudhsagar Falls",
-            "Chapora Fort",
-            "Cruise Dinner"
-        ],
-        "Manali": [
-            "Mall Road",
-            "Hadimba Temple",
-            "Solang Valley",
-            "Atal Tunnel",
-            "Rohtang Pass",
-            "Jogini Falls",
-            "Local Shopping"
-        ],
-        "Kashmir": [
-            "Dal Lake",
-            "Gulmarg",
-            "Mughal Gardens",
-            "Pahalgam",
-            "Sonmarg",
-            "Shankaracharya Temple",
-            "Local Market"
-        ],
-        "Jaipur": [
-            "Hawa Mahal",
-            "City Palace",
-            "Amer Fort",
-            "Jal Mahal",
-            "Nahargarh Fort",
-            "Albert Hall Museum",
-            "Local Shopping"
-        ],
-        "Kerala": [
-            "Munnar",
-            "Tea Gardens",
-            "Alleppey Houseboat",
-            "Kochi",
-            "Athirapally Falls",
-            "Thekkady",
-            "Beach Visit"
-        ],
-        "Ooty": [
-            "Botanical Garden",
-            "Ooty Lake",
-            "Toy Train",
-            "Doddabetta Peak",
-            "Tea Factory",
-            "Rose Garden",
-            "Pykara Lake"
-        ],
-        "Nagpur": [
-            "Deekshabhoomi",
-            "Futala Lake",
-            "Ambazari Lake",
-            "Maharajbag Zoo",
-            "Dragon Palace Temple",
-            "Sitabuldi Fort",
-            "Zero Mile Stone"
-                ],
+    try:
 
-        "Pune": [
-            "Shaniwar Wada",
-            "Aga Khan Palace",
-            "Sinhagad Fort",
-            "Khadakwasla Dam",
-            "Phoenix Mall",
-            "Saras Baug",
-            "FC Road"
-        ],
-        "Hyderabad": [
-            "Charminar",
-            "Golconda Fort",
-            "Ramoji Film City",
-            "Hussain Sagar Lake",
-            "Salar Jung Museum",
-            "Birla Mandir",
-            "Laad Bazaar"
-        ],
+        response = client.chat.completions.create(
 
-        "Mumbai": [
-            "Gateway of India",
-            "Marine Drive",
-            "Juhu Beach",
-            "Elephanta Caves",
-            "Bandra Bandstand",
-            "Colaba Causeway",
-            "Siddhivinayak Temple"
-]
-}
+            model="llama-3.3-70b-versatile",
 
-    itinerary = f"Destination: {destination}\n"
-    itinerary += f"Days: {days}\n"
-    itinerary += f"Budget: ₹{budget}\n\n"
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"""
+Create a detailed travel itinerary.
 
-    if budget < 10000:
-        itinerary += "Hotel: Budget Hotel\n\n"
-    elif budget < 30000:
-        itinerary += "Hotel: 3-Star Hotel\n\n"
-    else:
-        itinerary += "Hotel: Luxury Resort\n\n"
+Destination: {destination}
+Duration: {days} days
+Budget: ₹{budget}
+Transport: {transport}
 
-    activities = places.get(destination, ["Explore Local Attractions"])
+Please include:
 
-    for i in range(days):
-        itinerary += f"Day {i+1}: Visit {activities[i % len(activities)]}\n"
+1. Recommended hotel type according to budget
+2. Day-wise itinerary
+3. Famous places to visit
+4. Food recommendations
+5. Local travel tips
+6. Estimated daily spending
+
+Keep the response clean and easy to read.
+"""
+                }
+            ],
+
+            temperature=0.7,
+            max_tokens=1200
+        )
+
+        itinerary = response.choices[0].message.content
+
+    except Exception as e:
+        conn.close()
+        flash(f"Groq API Error: {str(e)}", "danger")
+        return redirect(url_for("my_trips"))
 
     conn.execute("""
         UPDATE trips
         SET ai_itinerary = ?
         WHERE id = ?
-    """, (itinerary, trip_id))
+    """, (
+        itinerary,
+        trip_id
+    ))
 
     conn.commit()
     conn.close()

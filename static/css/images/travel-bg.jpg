@@ -1,0 +1,2 @@
+<img src="{{ url_for('static', filename='images/travel-girl.png') }}">
+background: url("../images/travel-bg.jpg");

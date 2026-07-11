@@ -6,7 +6,7 @@ body{
 
 /* Navbar */
 .navbar{
-    box-shadow:0 3px 10px rgba(0,0,0,.15);
+    box-shadow:0 3px 10px rgba(46, 167, 92, 0.15);
 }
 
 /* Cards */
@@ -38,7 +38,7 @@ body{
 }
 
 .table tbody tr:hover{
-    background:#eef6ff;
+    background:#1c5aa0;
 }
 
 /* Form */
@@ -65,4 +65,54 @@ footer{
 /* Titles */
 h1,h2,h3,h4{
     font-weight:bold;
+}
+.home-bg{
+    background:
+        linear-gradient(
+            rgba(255,255,255,0.85),
+            rgba(255,255,255,0.85)
+        ),
+        url("../images/travel_bg.jpg");
+
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    padding: 30px;
+}
+.navbar{
+    background-color: white !important;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link{
+    color: black !important;
+    font-weight: bold;
+}
+
+.navbar .nav-link:hover{
+    color: #0d6efd !important;
+}
+.hero-section{
+    min-height:90vh;
+    background:
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
+    url("../images/travel-bg.jpg");
+    background-size:cover;
+    background-position:center;
+}
+
+.hero-image{
+    max-width:500px;
+}
+
+.feature-card{
+    background:white;
+    border-radius:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.1);
+    transition:.3s;
+}
+
+.feature-card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
 }

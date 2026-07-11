@@ -1,86 +1,89 @@
-
 {% extends 'base.html' %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
 
-        <div class="container py-5">
+<!-- Hero Section -->
+<section class="hero-section text-white d-flex align-items-center">
+    <div class="container">
+        <div class="row align-items-center">
 
-            <div class="text-center">
+            <div class="col-lg-6">
+                <span class="badge bg-primary mb-3">
+                    ✈️ Your Journey, Our AI
+                </span>
+                pya
+                <h1 class="display-3 fw-bold">
+                    Plan Your Dream Trip <br>
+                    with <span class="text-info">AI</span>
+                </h1>
 
-                <div class="text-center mb-5">
+                <p class="lead mt-4">
+                    Get personalized itineraries, budget planning,
+                    and smart recommendations in seconds.
+                </p>
 
-            <h1 class="fw-bold text-primary">
-                <i class="bi bi-airplane-fill"></i>
-                AI Trip Planner
-            </h1>
+                <div class="mt-4">
+                    <a href="{{ url_for('planner') }}"
+                       class="btn btn-primary btn-lg me-3">
+                        🚀 Plan My Trip
+                    </a>
 
-            <p class="text-muted">
-                Plan your journey smarter with AI-powered travel recommendations.
-            </p>
+                    <a href="{{ url_for('add_traveller') }}"
+                       class="btn btn-outline-light btn-lg">
+                        👥 Add Traveller
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6 text-center">
+                <img src="{{ url_for('static',
+                filename='images/travel-girl.png') }}"
+                class="img-fluid hero-image">
+            </div>
 
         </div>
+    </div>
+</section>
 
-        <p class="lead text-muted mb-4">
-            Plan your dream trip with AI-powered recommendations,
-            budget tracking, and smart itineraries.
-        </p>
+<!-- Features -->
+<section class="container py-5">
+    <div class="row g-4">
 
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <div class="col-md-3">
+            <div class="feature-card text-center p-4">
+                🤖
+                <h4>AI Itinerary</h4>
+                <p>Smart personalized trip plans.</p>
+            </div>
+        </div>
 
-            <a href="{{ url_for('planner') }}"
-               class="btn btn-primary btn-lg px-4">
-                🚀 Start Planning
-            </a>
+        <div class="col-md-3">
+            <div class="feature-card text-center p-4">
+                💰
+                <h4>Budget Friendly</h4>
+                <p>Trips for every budget.</p>
+            </div>
+        </div>
 
-            <a href="{{ url_for('add_traveller') }}"
-               class="btn btn-outline-success btn-lg px-4">
-                👥 Add Traveller
-            </a>
+        <div class="col-md-3">
+            <div class="feature-card text-center p-4">
+                🌍
+                <h4>Top Destinations</h4>
+                <p>Explore amazing places.</p>
+            </div>
+        </div>
 
+        <div class="col-md-3">
+            <div class="feature-card text-center p-4">
+                🔒
+                <h4>Secure & Easy</h4>
+                <p>Simple trip management.</p>
+            </div>
         </div>
 
     </div>
-
-    <div class="row mt-5 g-4">
-
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100 text-center">
-                <div class="card-body">
-                    <h3>🤖 AI Suggestions</h3>
-                    <p>
-                        Get personalized destination and itinerary
-                        recommendations.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100 text-center">
-                <div class="card-body">
-                    <h3>💰 Budget Tracking</h3>
-                    <p>
-                        Estimate and manage your travel expenses easily.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100 text-center">
-                <div class="card-body">
-                    <h3>🗺️ Smart Itinerary</h3>
-                    <p>
-                        Organize destinations, hotels, and activities in one place.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-</div>
+</section>
 
 {% endblock %}
