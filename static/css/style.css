@@ -80,10 +80,9 @@ h1,h2,h3,h4{
     padding: 30px;
 }
 .navbar{
-    background-color: white !important;
+    background-color:  rgb(106, 56, 192) !important;
 }
 
-.navbar .navbar-brand,
 .navbar .nav-link{
     color: black !important;
     font-weight: bold;
@@ -106,7 +105,7 @@ h1,h2,h3,h4{
 }
 
 .feature-card{
-    background:white;
+    background:rgb(247, 245, 251);
     border-radius:20px;
     box-shadow:0 5px 20px rgba(0,0,0,.1);
     transition:.3s;

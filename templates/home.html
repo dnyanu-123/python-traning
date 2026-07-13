@@ -1,89 +1,252 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}TripAI - Home{% endblock %}
 
 {% block content %}
 
-<!-- Hero Section -->
-<section class="hero-section text-white d-flex align-items-center">
-    <div class="container">
-        <div class="row align-items-center">
+<div class="container-fluid p-0">
 
-            <div class="col-lg-6">
-                <span class="badge bg-primary mb-3">
-                    ✈️ Your Journey, Our AI
-                </span>
-                pya
-                <h1 class="display-3 fw-bold">
-                    Plan Your Dream Trip <br>
-                    with <span class="text-info">AI</span>
-                </h1>
+    <!-- Hero Section -->
+    <section class="hero-section text-white text-center d-flex align-items-center">
+        <div class="container">
+            <h1 class="display-3 fw-bold">
+                ✈️ Your Journey, Our AI
+            </h1>
 
-                <p class="lead mt-4">
-                    Get personalized itineraries, budget planning,
-                    and smart recommendations in seconds.
-                </p>
+            <p class="lead mt-4 fs-4">
+                Plan Your Dream Trip with AI
+            </p>
 
-                <div class="mt-4">
-                    <a href="{{ url_for('planner') }}"
-                       class="btn btn-primary btn-lg me-3">
-                        🚀 Plan My Trip
-                    </a>
+            <p class="fs-5">
+                Get personalized itineraries, budget planning and smart travel recommendations in seconds.
+            </p>
 
-                    <a href="{{ url_for('add_traveller') }}"
-                       class="btn btn-outline-light btn-lg">
-                        👥 Add Traveller
-                    </a>
+            <div class="mt-4">
+                <a href="{{ url_for('register') }}"
+                   class="btn btn-warning btn-lg me-3 px-4">
+                    🚀 Get Started
+                </a>
+
+                <a href="{{ url_for('login') }}"
+                   class="btn btn-outline-light btn-lg px-4">
+                    🔐 Login
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Features -->
+    <div class="container mt-5">
+
+        <h2 class="text-center mb-5 fw-bold">
+            Why Choose TripAI?
+        </h2>
+
+        <div class="row">
+
+            <div class="col-md-3 mb-4">
+                <div class="card feature-card shadow border-0 text-center h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">🤖</div>
+                        <h4>AI Itinerary</h4>
+                        <p>Smart personalized trip plans for every traveller.</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-lg-6 text-center">
-                <img src="{{ url_for('static',
-                filename='images/travel-girl.png') }}"
-                class="img-fluid hero-image">
+            <div class="col-md-3 mb-4">
+                <div class="card feature-card shadow border-0 text-center h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">💰</div>
+                        <h4>Budget Friendly</h4>
+                        <p>Trips designed according to your budget.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card feature-card shadow border-0 text-center h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">🌍</div>
+                        <h4>Top Destinations</h4>
+                        <p>Explore beautiful places around the world.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card feature-card shadow border-0 text-center h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">🔒</div>
+                        <h4>Secure & Easy</h4>
+                        <p>Manage your trips safely and easily.</p>
+                    </div>
+                </div>
             </div>
 
         </div>
     </div>
-</section>
 
-<!-- Features -->
-<section class="container py-5">
-    <div class="row g-4">
 
-        <div class="col-md-3">
-            <div class="feature-card text-center p-4">
-                🤖
-                <h4>AI Itinerary</h4>
-                <p>Smart personalized trip plans.</p>
+    <!-- Statistics -->
+    <section class="stats-section text-center mt-5 py-5">
+
+        <div class="container">
+
+            <div class="row">
+
+                <div class="col-md-3 mb-4">
+                    <h1>1000+</h1>
+                    <p>Trips Planned</p>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h1>500+</h1>
+                    <p>Happy Travellers</p>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h1>50+</h1>
+                    <p>Destinations</p>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h1>4.9⭐</h1>
+                    <p>User Rating</p>
+                </div>
+
             </div>
+
         </div>
 
-        <div class="col-md-3">
-            <div class="feature-card text-center p-4">
-                💰
-                <h4>Budget Friendly</h4>
-                <p>Trips for every budget.</p>
-            </div>
-        </div>
+    </section>
 
-        <div class="col-md-3">
-            <div class="feature-card text-center p-4">
-                🌍
-                <h4>Top Destinations</h4>
-                <p>Explore amazing places.</p>
-            </div>
-        </div>
 
-        <div class="col-md-3">
-            <div class="feature-card text-center p-4">
-                🔒
-                <h4>Secure & Easy</h4>
-                <p>Simple trip management.</p>
+    <!-- Popular Destinations -->
+    <div class="container mt-5">
+
+        <h2 class="text-center mb-5 fw-bold">
+            Popular Destinations
+        </h2>
+
+        <div class="row">
+
+            <div class="col-md-4 mb-4">
+                <div class="card destination-card shadow border-0 text-center">
+                    <div class="card-body">
+                        <h1>🏖️</h1>
+                        <h4>Goa</h4>
+                        <p>Beach Paradise</p>
+                    </div>
+                </div>
             </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card destination-card shadow border-0 text-center">
+                    <div class="card-body">
+                        <h1>🏔️</h1>
+                        <h4>Manali</h4>
+                        <p>Mountain Adventure</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card destination-card shadow border-0 text-center">
+                    <div class="card-body">
+                        <h1>❄️</h1>
+                        <h4>Kashmir</h4>
+                        <p>Heaven on Earth</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
-</section>
+
+
+    <!-- Testimonials -->
+    <div class="container mt-5 mb-5">
+
+        <h2 class="text-center mb-5 fw-bold">
+            What Travellers Say
+        </h2>
+
+        <div class="row">
+
+            <div class="col-md-6 mb-4">
+                <div class="card shadow border-0">
+                    <div class="card-body">
+                        <h5>⭐⭐⭐⭐⭐</h5>
+                        <p>
+                            "TripAI planned my Goa trip perfectly and saved a lot of time."
+                        </p>
+                        <h6>- Aarti</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card shadow border-0">
+                    <div class="card-body">
+                        <h5>⭐⭐⭐⭐⭐</h5>
+                        <p>
+                            "Budget estimation and AI itinerary were very accurate."
+                        </p>
+                        <h6>- Rahul</h6>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.hero-section{
+    min-height:90vh;
+    background:linear-gradient(135deg,#4facfe,#00f2fe);
+}
+
+.feature-card{
+    border-radius:25px;
+    transition:0.4s;
+}
+
+.feature-card:hover{
+    transform:translateY(-10px);
+}
+
+.destination-card{
+    border-radius:25px;
+    transition:0.4s;
+}
+
+.destination-card:hover{
+    transform:translateY(-10px);
+}
+
+.feature-icon{
+    font-size:60px;
+    margin-bottom:15px;
+}
+
+.stats-section{
+    background:linear-gradient(135deg,#667eea,#764ba2);
+    color:white;
+}
+
+.stats-section h1{
+    font-size:50px;
+    font-weight:bold;
+}
+
+</style>
 
 {% endblock %}

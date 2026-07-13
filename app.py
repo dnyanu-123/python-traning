@@ -30,26 +30,23 @@ client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
 app = Flask(__name__)
-app.secret_key = "traveller_secret_key"
+app.secret_key = os.getenv("SECRET_KEY")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-
 import os
 import sqlite3
 
 def get_db():
-    if os.name == "nt":   # Windows
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(BASE_DIR, "trip_planner.db")
-    else:                 # PythonAnywhere/Linux
-        db_path = "/home/Dnyaneshwari2026/ai_trip_planner/trip_planner.db"
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "trip_planner.db")
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 
 class User(UserMixin):
@@ -82,7 +79,8 @@ def load_user(user_id):
 
 @app.route("/")
 def home():
-    return redirect(url_for("login"))
+    return render_template("home.html")
+
 @app.route("/about")
 
 def about():
@@ -242,7 +240,49 @@ def logout():
     logout_user()
 
     return redirect(url_for("login"))
+#*************************************my_trips***********************************
+@app.route("/my_trips")
+@login_required
+def my_trips():
 
+    conn = get_db()
+
+    # ADMIN → see ALL trips
+    if current_user.role == "admin":
+
+        trips = conn.execute("""
+            SELECT
+                trips.*,
+                travellers.name
+            FROM trips
+            INNER JOIN travellers
+                ON trips.traveller_id = travellers.id
+            ORDER BY trips.id DESC
+        """).fetchall()
+
+    # NORMAL USER → see only own trips
+    else:
+
+        traveller = conn.execute("""
+            SELECT id
+            FROM travellers
+            WHERE user_id = ?
+        """, (current_user.id,)).fetchone()
+
+        if not traveller:
+            conn.close()
+            return render_template("my_trips.html", trips=[])
+
+        trips = conn.execute("""
+            SELECT *
+            FROM trips
+            WHERE traveller_id = ?
+            ORDER BY id DESC
+        """, (traveller["id"],)).fetchall()
+
+    conn.close()
+
+    return render_template("my_trips.html", trips=trips)
 #**************************Add traveller section**************************
 
 
@@ -418,58 +458,33 @@ def dashboard():
         FROM trips
     """).fetchone()["total"]
 
+    # Destination Budget Analysis
+    chart_data = conn.execute("""
+        SELECT destination, SUM(budget) AS total_budget
+        FROM trips
+        GROUP BY destination
+        ORDER BY total_budget DESC
+    """).fetchall()
+
+    labels = []
+    budgets = []
+
+    for row in chart_data:
+        labels.append(row["destination"])
+        budgets.append(row["total_budget"])
+
     conn.close()
 
     return render_template(
-        "dashboard.html",
-        total_users=total_users,
-        total_travellers=total_travellers,
-        total_trips=total_trips,
-        total_budget=total_budget
-    )
-#*********************************************MY TRIPS SECTION**********************************************
-@app.route("/my_trips")
-@login_required
-def my_trips():
-
-    conn = get_db()
-
-    # ADMIN → see ALL trips
-    if current_user.role == "admin":
-
-        trips = conn.execute("""
-            SELECT
-                trips.*,
-                travellers.name
-            FROM trips
-            INNER JOIN travellers
-                ON trips.traveller_id = travellers.id
-            ORDER BY trips.id DESC
-        """).fetchall()
-
-    # NORMAL USER → see only own trips
-    else:
-
-        traveller = conn.execute("""
-            SELECT id
-            FROM travellers
-            WHERE user_id = ?
-        """, (current_user.id,)).fetchone()
-
-        if not traveller:
-            conn.close()
-            return render_template("my_trips.html", trips=[])
-
-        trips = conn.execute("""
-            SELECT *
-            FROM trips
-            WHERE traveller_id = ?
-            ORDER BY id DESC
-        """, (traveller["id"],)).fetchall()
-
-    conn.close()
-
-    return render_template("my_trips.html", trips=trips)
+    "dashboard.html",
+    total_users=total_users,
+    total_travellers=total_travellers,
+    total_trips=total_trips,
+    total_budget=total_budget,
+    labels=labels,
+    budgets=budgets
+)
+    
 #******************************Filter section*******************************
 
 @app.route("/filter")
@@ -552,6 +567,29 @@ def search():
     conn.close()
 
     return render_template("search.html", results=results)
+#*************************************view***********************
+
+@app.route("/view_traveller/<int:traveller_id>")
+@login_required
+def view_traveller(traveller_id):
+
+    conn = get_db()
+
+    traveller = conn.execute("""
+        SELECT *
+        FROM travellers
+        WHERE id = ?
+    """, (traveller_id,)).fetchone()
+
+    conn.close()
+
+    if traveller is None:
+        abort(404)
+
+    return render_template(
+        "view_traveller.html",
+        traveller=traveller
+    )
 #****************************Delete section******************************
 
 from flask_login import login_required, current_user
@@ -863,6 +901,49 @@ def recommend_trip():
     return render_template(
         "recommend_trip.html",
         itinerary=itinerary
+    )
+
+#****************************************************ai chatbot*********************************************
+@app.route("/chatbot", methods=["GET", "POST"])
+@login_required
+def chatbot():
+
+    response_text = ""
+
+    if request.method == "POST":
+
+        user_message = request.form["message"]
+
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": """
+                You are an AI Travel Assistant for an AI Trip Planner application.
+                Help users with travel planning, destinations, budgets,
+                hotels, restaurants, itineraries and travel tips.
+                Keep answers concise and helpful.
+                """
+                    },
+                    {
+                        "role": "user",
+                        "content": user_message
+                    }
+                ],
+                temperature=0.7,
+                max_tokens=600
+            )
+
+            response_text = response.choices[0].message.content
+
+        except Exception as e:
+            response_text = f"Error: {str(e)}"
+
+    return render_template(
+        "chatbot.html",
+        response=response_text
     )
 #***********************************************generate AI section**********************************************
 @app.route("/generate_ai/<int:trip_id>")
