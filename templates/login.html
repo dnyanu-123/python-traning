@@ -1,177 +1,183 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+<div class="container-fluid">
+    <div class="row min-vh-100">
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Left Side -->
+        <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center text-white"
+             style="background: linear-gradient(135deg,#667eea,#764ba2);">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+            <div class="text-center p-5">
+                <h1 class="display-4 fw-bold mb-4">
+                    ✈️ Plan Your Dream Trip With AI
+                </h1>
 
-    <style>
+                <p class="fs-5 mb-5">
+                    Get personalized itineraries, budget planning and smart travel recommendations in seconds.
+                </p>
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
-}
+                <div class="row">
 
-body{
-    
-    background: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
-    background-size: cover;
-    background-position: center;
-}
+                    <div class="col-6 mb-4">
+                        <div class="p-3">
+                            <h2>🤖</h2>
+                            <h5>AI Itinerary</h5>
+                            <p>Smart personalized trip plans.</p>
+                        </div>
+                    </div>
 
-.login-box{
+                    <div class="col-6 mb-4">
+                        <div class="p-3">
+                            <h2>💰</h2>
+                            <h5>Budget Friendly</h5>
+                            <p>Trips for every budget.</p>
+                        </div>
+                    </div>
 
-    width:380px;
-    padding:40px;
+                    <div class="col-6 mb-4">
+                        <div class="p-3">
+                            <h2>🌍</h2>
+                            <h5>Top Destinations</h5>
+                            <p>Explore amazing places.</p>
+                        </div>
+                    </div>
 
-    background:rgba(255,255,255,.15);
+                    <div class="col-6 mb-4">
+                        <div class="p-3">
+                            <h2>🔒</h2>
+                            <h5>Secure & Easy</h5>
+                            <p>Simple trip management.</p>
+                        </div>
+                    </div>
 
-    backdrop-filter:blur(15px);
+                </div>
+            </div>
 
-    border-radius:20px;
+        </div>
 
-    box-shadow:0 8px 32px rgba(0,0,0,.3);
+        <!-- Right Side Login Form -->
+        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-light">
 
-    color:white;
-}
+            <div class="card shadow-lg border-0 p-4 login-card">
 
-.login-box h2{
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">🌍 AI Trip Planner</h2>
+                    <p class="text-muted">Login to continue your journey</p>
+                </div>
 
-    text-align:center;
-    margin-bottom:30px;
-    font-weight:bold;
+                <form method="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-envelope-fill"></i> Email
+                        </label>
+
+                        <input type="email"
+                               name="email"
+                               class="form-control form-control-lg"
+                               placeholder="Enter your email"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-lock-fill"></i> Password
+                        </label>
+
+                        <div class="input-group">
+                            <input type="password"
+                                   name="password"
+                                   id="password"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter password"
+                                   required>
+
+                            <button class="btn btn-outline-secondary"
+                                    type="button"
+                                    onclick="togglePassword()">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <input type="checkbox">
+                            Remember me
+                        </div>
+
+                        <a href="#" class="text-decoration-none">
+                            Forgot Password?
+                        </a>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary btn-lg w-100">
+                        Login
+                        <i class="bi bi-box-arrow-in-right"></i>
+                    </button>
+
+                </form>
+
+                <div class="text-center mt-4">
+                    Don't have an account?
+                    <a href="{{ url_for('register') }}"
+                       class="text-decoration-none fw-bold">
+                        Register
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+
+.login-card{
+    width:450px;
+    border-radius:25px;
 }
 
 .form-control{
-
-    background:rgba(255,255,255,.2);
-    border:none;
-    color:white;
+    border-radius:12px;
 }
 
-.form-control::placeholder{
-    color:#eee;
+.btn{
+    border-radius:12px;
 }
 
-.form-control:focus{
-    background:rgba(255,255,255,.25);
-    color:white;
-    box-shadow:none;
+.card{
+    transition:0.3s;
 }
 
-.input-group-text{
-    background:rgba(255,255,255,.2);
-    border:none;
-    color:white;
+.card:hover{
+    transform:translateY(-5px);
 }
 
-.btn-login{
+</style>
 
-    width:100%;
-    border-radius:30px;
-    padding:10px;
-    font-weight:bold;
+<script>
+
+function togglePassword() {
+
+    const password = document.getElementById("password");
+
+    if(password.type === "password"){
+        password.type = "text";
+    }
+    else{
+        password.type = "password";
+    }
+
 }
 
-.extra{
-    text-align:center;
-    margin-top:20px;
-}
+</script>
 
-.extra a{
-    color:white;
-    text-decoration:none;
-}
-
-.extra a:hover{
-    text-decoration:underline;
-}
-
-    </style>
-
-</head>
-
-<body>
-
-<div class="login-box">
-
-<h2>
-<i class="fa-solid fa-plane"></i>
-AI Trip Planner
-</h2>
-
-<form action="/login" method="POST">
-
-<div class="mb-3">
-
-<div class="input-group">
-
-<span class="input-group-text">
-<i class="fa fa-user"></i>
-</span>
-
-<input
-type="text"
-name="email"
-class="form-control"
-placeholder="Email"
-required>
-
-</div>
-
-</div>
-
-<div class="mb-3">
-
-<div class="input-group">
-
-<span class="input-group-text">
-<i class="fa fa-lock"></i>
-</span>
-
-<input
-type="password"
-name="password"
-class="form-control"
-placeholder="Password"
-required>
-
-</div>
-
-</div>
-
-<button class="btn btn-primary btn-login">
-Login
-</button>
-
-<div class="extra">
-
-<p>
-Don't have an account?
-<a href="/register">Register</a>
-</p>
-
-</div>
-
-</form>
-
-</div>
-
-</body>
-</html>
 {% endblock %}
