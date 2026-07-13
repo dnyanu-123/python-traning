@@ -29,15 +29,17 @@ load_dotenv()
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
+
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
+
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "ai_trip_planner_secret_2026"
+)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
-
-import os
-import sqlite3
 
 def get_db():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
