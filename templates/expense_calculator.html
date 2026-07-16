@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}
+Expense Calculator
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+            💸 Expense Calculator
+        </div>
+
+        <div class="card-body">
+
+            <h3>📍 {{ trip.destination }}</h3>
+
+            <p>⏰ {{ trip.days }} Days</p>
+
+            <p>💰 Total Budget: ₹{{ trip.budget }}</p>
+
+            <table class="table table-bordered mt-4">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Category</th>
+                        <th>Estimated Cost</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>🏨 Hotel</td>
+                        <td>₹{{ hotel_cost }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>🍴 Food</td>
+                        <td>₹{{ food_cost }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>🚕 Local Transport</td>
+                        <td>₹{{ local_transport }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>📸 Sightseeing</td>
+                        <td>₹{{ sightseeing }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>🛍 Shopping</td>
+                        <td>₹{{ shopping }}</td>
+                    </tr>
+
+                    <tr class="table-success">
+                        <td><strong>Total</strong></td>
+                        <td><strong>₹{{ trip.budget }}</strong></td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+            <a href="{{ url_for('my_trips') }}"
+               class="btn btn-secondary">
+                ← Back
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

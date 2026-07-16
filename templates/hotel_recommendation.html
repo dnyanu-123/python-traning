@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}
+Hotel Recommendation
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+
+        <h2 class="text-primary fw-bold">
+            🏨 AI Hotel Recommendations
+        </h2>
+
+        <p class="text-muted">
+            Best hotels in {{ trip.destination }}
+        </p>
+
+    </div>
+
+    <!-- Destination Banner -->
+    <div class="card shadow mb-4">
+
+        <img
+            src="https://picsum.photos/900/400?random={{ trip.id }}"
+            class="card-img-top"
+            style="height:400px; object-fit:cover;"
+            alt="Destination Image"
+        >
+
+        <div class="card-body">
+
+            <h3 class="text-primary">
+                📍 {{ trip.destination }}
+            </h3>
+
+            <p>
+                💰 <strong>Budget:</strong>
+                ₹{{ trip.budget }}
+            </p>
+
+            <p>
+                ⏰ <strong>Duration:</strong>
+                {{ trip.days }} Days
+            </p>
+
+            <p>
+                🚗 <strong>Transport:</strong>
+                {{ trip.transport }}
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Hotel Image Cards -->
+    <div class="row mb-4">
+
+        <!-- Hotel 1 -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card shadow h-100">
+
+                <img
+                    src="https://picsum.photos/400/250?random=11"
+                    class="card-img-top"
+                    style="height:220px; object-fit:cover;"
+                    alt="Luxury Hotel"
+                >
+
+                <div class="card-body text-center">
+
+                    <h5 class="card-title">
+                        🏨 Luxury Resort
+                    </h5>
+
+                    <p class="text-success fw-bold">
+                        ₹8000 / Night
+                    </p>
+
+                    <p class="text-muted small">
+                        Premium stay with swimming pool and spa.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Hotel 2 -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card shadow h-100">
+
+                <img
+                    src="https://picsum.photos/400/250?random=12"
+                    class="card-img-top"
+                    style="height:220px; object-fit:cover;"
+                    alt="Beach Resort"
+                >
+
+                <div class="card-body text-center">
+
+                    <h5 class="card-title">
+                        🏖 Beach Resort
+                    </h5>
+
+                    <p class="text-success fw-bold">
+                        ₹5000 / Night
+                    </p>
+
+                    <p class="text-muted small">
+                        Beautiful views and family-friendly stay.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Hotel 3 -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card shadow h-100">
+
+                <img
+                    src="https://picsum.photos/400/250?random=13"
+                    class="card-img-top"
+                    style="height:220px; object-fit:cover;"
+                    alt="Budget Hotel"
+                >
+
+                <div class="card-body text-center">
+
+                    <h5 class="card-title">
+                        🏠 Budget Hotel
+                    </h5>
+
+                    <p class="text-success fw-bold">
+                        ₹2500 / Night
+                    </p>
+
+                    <p class="text-muted small">
+                        Comfortable rooms at affordable prices.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Hotel 4 -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card shadow h-100">
+
+                <img
+                    src="https://picsum.photos/400/250?random=14"
+                    class="card-img-top"
+                    style="height:220px; object-fit:cover;"
+                    alt="Mountain Hotel"
+                >
+
+                <div class="card-body text-center">
+
+                    <h5 class="card-title">
+                        ⛰ Mountain View Hotel
+                    </h5>
+
+                    <p class="text-success fw-bold">
+                        ₹6500 / Night
+                    </p>
+
+                    <p class="text-muted small">
+                        Scenic views with modern amenities.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- AI Hotel Recommendation -->
+    <div class="card shadow">
+
+        <div class="card-header bg-success text-white">
+
+            🤖 AI Recommended Hotels
+
+        </div>
+
+        <div class="card-body">
+
+            {% if hotels %}
+
+            <pre style="
+                white-space: pre-wrap;
+                font-size:15px;
+                font-family: inherit;
+                margin:0;
+            ">{{ hotels }}</pre>
+
+            {% else %}
+
+            <p class="text-muted">
+                No hotel recommendations available.
+            </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- Back Button -->
+    <div class="mt-4 text-center">
+
+        <a href="{{ url_for('my_trips') }}"
+           class="btn btn-secondary">
+
+            ← Back to My Trips
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

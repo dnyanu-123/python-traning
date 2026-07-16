@@ -149,6 +149,19 @@
                             🤖 Generate AI
                         </a>
 
+                        <a href="{{ url_for('hotel_recommendation',
+                            trip_id=trip.id) }}"
+                            class="btn btn-sm btn-success">
+
+                                🏨 Hotels
+                            </a>
+                          
+                        <a href="{{ url_for('expense_calculator',
+                            trip_id=trip.id) }}"
+                            class="btn btn-sm btn-info">
+                                💸 Expenses
+                            </a>
+                            
                         <a href="https://www.google.com/maps/search/{{ trip.destination }}"
                            target="_blank"
                            class="btn btn-sm btn-outline-primary">

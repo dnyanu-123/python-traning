@@ -41,7 +41,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-def get_db():
+def get_db():                       #connection with the SQLite
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(BASE_DIR, "trip_planner.db")
 
@@ -52,7 +52,7 @@ def get_db():
 
 
 class User(UserMixin):
-
+#User class and load_user() function are used by Flask-Login to manage user sessions and authentication.
     def __init__(self, id, username, email, password, role):
         self.id = id
         self.username = username
@@ -812,6 +812,85 @@ def relationship_demo():
 @login_required
 def recommend_trip():
 
+    itinerary = None
+
+    if request.method == "POST":
+
+        destination = request.form["destination"]
+        budget = request.form["budget"]
+        days = request.form["days"]
+
+        travel_type = request.form.get(
+            "travel_type",
+            "Solo"
+        )
+
+        hotel_preference = request.form.get(
+            "hotel_preference",
+            "Standard"
+        )
+
+        transport = request.form.get(
+            "transport",
+            "Bus"
+        )
+
+        season = request.form.get(
+            "season",
+            "Summer"
+        )
+
+        prompt = f"""
+Create a detailed travel itinerary.
+
+Destination: {destination}
+Budget: ₹{budget}
+Days: {days}
+
+Travel Type: {travel_type}
+Hotel Preference: {hotel_preference}
+Transport Type: {transport}
+Season: {season}
+
+Generate:
+
+1. Day wise itinerary
+2. Famous places to visit
+3. Local food recommendations
+4. Recommended hotels
+5. Estimated expenses
+6. Travel tips
+7. Packing suggestions
+
+Generate the itinerary specifically for {destination}.
+"""
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+
+        itinerary = (
+            response
+            .choices[0]
+            .message
+            .content
+        )
+
+    return render_template(
+        "recommend_trip.html",
+        itinerary=itinerary
+    )
+'''@app.route("/recommend_trip", methods=["GET", "POST"])
+@login_required
+def recommend_trip():
+
     itinerary = ""
 
     places = {
@@ -903,7 +982,7 @@ def recommend_trip():
     return render_template(
         "recommend_trip.html",
         itinerary=itinerary
-    )
+    )'''
 
 #****************************************************ai chatbot*********************************************
 @app.route("/chatbot", methods=["GET", "POST"])
@@ -1041,6 +1120,135 @@ Keep the response clean and easy to read.
 
     return redirect(url_for("my_trips"))
 
+#****************************************hotel recommendation section**********************************************
+@app.route("/hotel_recommendation/<int:trip_id>")
+@login_required
+def hotel_recommendation(trip_id):
+
+    conn = get_db()
+
+    # Admin can access any trip
+    if current_user.role == "admin":
+
+        trip = conn.execute("""
+            SELECT *
+            FROM trips
+            WHERE id = ?
+        """, (trip_id,)).fetchone()
+
+    # Normal user can access only own trip
+    else:
+
+        trip = conn.execute("""
+            SELECT trips.*
+            FROM trips
+            JOIN travellers
+            ON trips.traveller_id = travellers.id
+            WHERE trips.id = ?
+            AND travellers.user_id = ?
+        """, (
+            trip_id,
+            current_user.id
+        )).fetchone()
+
+    if not trip:
+        conn.close()
+        flash(
+            "Trip not found or access denied.",
+            "danger"
+        )
+        return redirect(
+            url_for("my_trips")
+        )
+
+    destination = trip["destination"]
+    budget = trip["budget"]
+    days = trip["days"]
+
+    try:
+
+        response = client.chat.completions.create(
+
+            model="llama-3.3-70b-versatile",
+
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"""
+Suggest 5 hotels in {destination}
+for a budget of ₹{budget}
+for a trip of {days} days.
+
+For each hotel provide:
+
+1. Hotel Name
+2. Approximate price per night
+3. Hotel Type
+4. Why it is recommended
+5. Nearby attractions
+
+Format nicely with headings and bullet points.
+"""
+                }
+            ],
+
+            temperature=0.7,
+            max_tokens=1000
+        )
+
+        hotels = response.choices[0].message.content
+
+    except Exception as e:
+
+        hotels = f"Error: {str(e)}"
+
+    conn.close()
+
+    return render_template(
+        "hotel_recommendation.html",
+        trip=trip,
+        hotels=hotels
+    )
+#********************************************expence traker section**********************************************
+@app.route("/expense_calculator/<int:trip_id>")
+@login_required
+def expense_calculator(trip_id):
+
+    conn = get_db()
+
+    trip = conn.execute(
+        """
+        SELECT *
+        FROM trips
+        WHERE id = ?
+        """,
+        (trip_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if not trip:
+        flash("Trip not found!", "danger")
+        return redirect(url_for("my_trips"))
+
+    total_budget = trip["budget"]
+
+    hotel_cost = total_budget * 0.35
+    food_cost = total_budget * 0.15
+    local_transport = total_budget * 0.10
+    sightseeing = total_budget * 0.10
+    shopping = total_budget * 0.30
+
+    return render_template(
+        "expense_calculator.html",
+        trip=trip,
+        hotel_cost=hotel_cost,
+        food_cost=food_cost,
+        local_transport=local_transport,
+        sightseeing=sightseeing,
+        shopping=shopping
+    )
+#*****************************************trip details section**********************************************
 
 @app.route("/trip/<int:trip_id>")
 @login_required
